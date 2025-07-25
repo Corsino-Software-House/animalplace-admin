@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { env } from './env';
 
-// Base URLs separadas para facilitar mudanças
-export const BASE_URL = 'https://b94d9ce85a43.ngrok-free.app';
+// Base URL da API
+export const BASE_URL = env.BASE_URL_API;
 
 // Configuração do Axios para login
 export const apiLogin = axios.create({
