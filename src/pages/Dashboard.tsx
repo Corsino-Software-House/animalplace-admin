@@ -55,6 +55,7 @@ export function Dashboard() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
         </div>
+        {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, index) => (
             <Card key={index}>
@@ -68,6 +69,44 @@ export function Dashboard() {
               </CardContent>
             </Card>
           ))}
+        </div>
+        {/* Content Grid Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Activity Skeleton */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div>
+                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          {/* Quick Actions Skeleton */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
