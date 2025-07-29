@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiLogin, apiRegister, API_ENDPOINTS, LoginData, LoginResponse, RegisterData } from '../lib/api';
+import { api } from '@/lib/api';
+import { API_ENDPOINTS } from '@/lib/api-routes';
+import { LoginData, LoginResponse, RegisterData } from '@/types/auth';
 import { toast } from 'sonner';
 
-// Tipos para as respostas de erro
 interface ApiError {
   response?: {
     data?: {
@@ -16,26 +17,22 @@ interface RegisterResponse {
   message: string;
 }
 
-// Hook para login
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: LoginData): Promise<LoginResponse> => {
-      const response = await apiLogin.post(API_ENDPOINTS.LOGIN, data);
+      const response = await api.post(API_ENDPOINTS.LOGIN, data);
       return response.data;
     },
     onSuccess: (data) => {
-      // Salvar token no localStorage
       localStorage.setItem('animalplace_token', data.data.token);
       localStorage.setItem('animalplace_user', JSON.stringify(data.data.user));
       
       toast.success(data.message);
       
-      // Invalidar queries relacionadas ao usuário
       queryClient.invalidateQueries({ queryKey: ['user'] });
       
-      // Redirecionar para dashboard (será implementado no componente)
     },
     onError: (error: ApiError) => {
       console.error('Erro no login:', error);
@@ -44,11 +41,10 @@ export const useLogin = () => {
   });
 };
 
-// Hook para registro
 export const useRegister = () => {
   return useMutation({
     mutationFn: async (data: RegisterData): Promise<RegisterResponse> => {
-      const response = await apiRegister.post(API_ENDPOINTS.REGISTER, data);
+      const response = await api.post(API_ENDPOINTS.REGISTER, data);
       return response.data;
     },
     onSuccess: () => {
@@ -61,7 +57,6 @@ export const useRegister = () => {
   });
 };
 
-// Hook para logout
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
@@ -73,7 +68,6 @@ export const useLogout = () => {
   };
 };
 
-// Hook para verificar se está autenticado
 export const useAuth = () => {
   const token = localStorage.getItem('animalplace_token');
   const userString = localStorage.getItem('animalplace_user');
