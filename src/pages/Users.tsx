@@ -1,133 +1,380 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, MoreHorizontal, Eye, UserCheck, UserX } from 'lucide-react';
-
-const mockUsers = [
-  { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', plan: 'Premium', status: 'active', joined: '2024-01-15' },
-  { id: 2, name: 'Mike Chen', email: 'mike@email.com', plan: 'Basic', status: 'active', joined: '2024-01-20' },
-  { id: 3, name: 'Emma Davis', email: 'emma@email.com', plan: 'Pro', status: 'inactive', joined: '2024-01-10' },
-  { id: 4, name: 'Alex Wilson', email: 'alex@email.com', plan: 'Premium', status: 'active', joined: '2024-01-25' }
-];
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { Search, Loader2, PawPrint, ChevronDown, ChevronRight, Calendar, Heart, Scissors, Weight, Users as UsersIcon, Star, Crown } from 'lucide-react';
+import { getUsers } from '@/services/get-users';
+import { UserPet } from '@/types/users';  
+import { colors } from '@/theme/colors';
 
 export function Users() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
 
-  const filteredUsers = mockUsers.filter(user =>
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+  });
+
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Users</h1>
-          <p className="text-gray-600 mt-2">Manage all registered users and their subscriptions</p>
+  const toggleUserExpansion = (userId: string) => {
+    const newExpanded = new Set(expandedUsers);
+    if (newExpanded.has(userId)) {
+      newExpanded.delete(userId);
+    } else {
+      newExpanded.add(userId);
+    }
+    setExpandedUsers(newExpanded);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
+
+  const PetDetails = ({ pet }: { pet: UserPet }) => (
+    <div className="border rounded-lg p-5 mb-4" style={{ 
+      backgroundColor: colors.background,
+      borderColor: colors.gray_ultra_light 
+    }}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.green }}>
+          <PawPrint className="h-5 w-5 text-white" />
         </div>
-        <Button style={{ backgroundColor: '#95CA3C' }} className="text-white hover:opacity-90">
-          <Plus className="mr-2 h-4 w-4" />
-          Add User
-        </Button>
+        <div>
+          <h4 className="font-semibold text-lg" style={{ color: colors.black }}>{pet.nome}</h4>
+          <Badge variant="outline" style={{ 
+            borderColor: colors.purple, 
+            color: colors.purple 
+          }}>
+            {pet.tipo_animal}
+          </Badge>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>SEXO</p>
+          <p className="font-medium" style={{ color: colors.black }}>{pet.sexo}</p>
+        </div>
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <div className="flex items-center gap-1 mb-1">
+            <Calendar className="h-3 w-3" style={{ color: colors.gray_light }} />
+            <p className="text-xs font-medium" style={{ color: colors.gray_light }}>IDADE</p>
+          </div>
+          <p className="font-medium" style={{ color: colors.black }}>{pet.idade} anos</p>
+        </div>
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>RAÇA</p>
+          <p className="font-medium" style={{ color: colors.black }}>{pet.raca}</p>
+        </div>
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>PELAGEM</p>
+          <p className="font-medium" style={{ color: colors.black }}>{pet.pelagem}</p>
+        </div>
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <div className="flex items-center gap-1 mb-1">
+            <Weight className="h-3 w-3" style={{ color: colors.gray_light }} />
+            <p className="text-xs font-medium" style={{ color: colors.gray_light }}>PESO</p>
+          </div>
+          <p className="font-medium" style={{ color: colors.black }}>{pet.peso}</p>
+        </div>
+        <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
+          <div className="flex items-center gap-1 mb-1">
+            <Scissors className="h-3 w-3" style={{ color: colors.gray_light }} />
+            <p className="text-xs font-medium" style={{ color: colors.gray_light }}>CASTRADO</p>
+          </div>
+          <Badge variant={pet.castrado ? "default" : "secondary"} style={{
+            backgroundColor: pet.castrado ? colors.green : colors.gray_light,
+            color: 'white',
+            border: 'none'
+          }}>
+            {pet.castrado ? "Sim" : "Não"}
+          </Badge>
+        </div>
+        <div className="p-3 rounded-md md:col-span-2" style={{ backgroundColor: colors.background }}>
+          <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>CADASTRADO EM</p>
+          <p className="font-medium" style={{ color: colors.black }}>{formatDate(pet.created_at)}</p>
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex space-x-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      {pet.planAtivo && pet.planAtivo.plan && (
+        <div className="border rounded-lg p-4 mb-4" style={{ 
+          backgroundColor: '#f0f9ff',
+          borderColor: colors.green 
+        }}>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.green }}>
+              <Heart className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h5 className="font-semibold" style={{ color: colors.black }}>Plano Ativo</h5>
+              <p className="text-sm" style={{ color: colors.gray_light }}>Plano atual do pet</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>NOME DO PLANO</p>
+              <p className="font-medium" style={{ color: colors.black }}>
+                {pet.planAtivo.plan.name || 'Nome não disponível'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>STATUS</p>
+              <Badge style={{ 
+                backgroundColor: pet.planAtivo.plan.mainColor || colors.green,
+                color: 'white',
+                border: 'none'
+              }}>
+                {pet.planAtivo.status || 'Status não disponível'}
+              </Badge>
+            </div>
+            <div>
+              <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>PRÓXIMO PAGAMENTO</p>
+              <p className="font-medium" style={{ color: colors.black }}>
+                {pet.planAtivo.next_payment_date ? formatDate(pet.planAtivo.next_payment_date) : 'Data não disponível'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pet.subscriptions && pet.subscriptions.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="h-4 w-4" style={{ color: colors.yellow }} />
+            <h5 className="font-semibold" style={{ color: colors.black }}>
+              Histórico de Planos ({pet.subscriptions.length})
+            </h5>
+          </div>
+          <div className="space-y-2">
+            {pet.subscriptions.slice(0, 3).map((subscription) => (
+              <div key={subscription.id_subscription} 
+                   className="border rounded-md p-3" 
+                   style={{ borderColor: colors.gray_ultra_light }}>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <p className="font-medium" style={{ color: colors.black }}>
+                      {subscription.plan?.name || 'Nome não disponível'}
+                    </p>
+                    <p className="text-sm mt-1" style={{ color: colors.gray_light }}>
+                      {subscription.start_date ? formatDate(subscription.start_date) : 'Data não disponível'} - {subscription.due_date ? formatDate(subscription.due_date) : 'Data não disponível'}
+                    </p>
+                  </div>
+                  <div className="text-right ml-4">
+                    <Badge style={{
+                      backgroundColor: subscription.status === 'active' ? colors.green : colors.gray_light,
+                      color: 'white',
+                      border: 'none'
+                    }}>
+                      {subscription.status || 'Status não disponível'}
+                    </Badge>
+                    <p className="text-xs mt-1" style={{ color: colors.gray_light }}>
+                      {subscription.payment_status || 'Status não disponível'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {pet.subscriptions.length > 3 && (
+              <div className="text-center py-2">
+                <p className="text-sm px-3 py-1 rounded-md inline-block" style={{ 
+                  color: colors.gray_light,
+                  backgroundColor: colors.background 
+                }}>
+                  +{pet.subscriptions.length - 3} planos adicionais
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: colors.background }}>
+        <Card className="w-full max-w-md" style={{ borderColor: colors.red }}>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: `${colors.red}20` }}>
+                <UsersIcon className="h-8 w-8" style={{ color: colors.red }} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2" style={{ color: colors.red }}>
+                Erro ao carregar usuários
+              </h3>
+              <p className="text-sm" style={{ color: colors.gray_light }}>
+                {error instanceof Error ? error.message : 'Erro desconhecido'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen p-6" >
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
+              <UsersIcon className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold" style={{ color: colors.black }}>
+              Usuários
+            </h1>
+          </div>
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: colors.gray_light }}>
+            Gerencie todos os usuários registrados, seus pets e planos
+          </p>
+        </div>
+
+        {/* Search */}
+        <Card className="max-w-md mx-auto" style={{ backgroundColor: colors.background, borderColor: colors.gray_ultra_light }}>
+          <CardContent className="pt-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: colors.gray_light }} />
               <Input
-                placeholder="Search users..."
+                placeholder="Buscar usuários..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
+                style={{ borderColor: colors.gray_ultra_light }}
               />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Users ({filteredUsers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell className="text-gray-600">{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{user.plan}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={user.status === 'active' ? 'default' : 'secondary'}
-                      style={user.status === 'active' ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
-                    >
-                      {user.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-600">{user.joined}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <UserCheck className="mr-2 h-4 w-4" />
-                          Activate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <UserX className="mr-2 h-4 w-4" />
-                          Deactivate
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+        {/* Users List */}
+        <Card style={{ backgroundColor: colors.background, borderColor: colors.gray_ultra_light }}>
+          <CardHeader style={{ backgroundColor: colors.purple }}>
+            <CardTitle className="text-xl font-semibold flex items-center gap-2 text-white">
+              <UsersIcon className="h-5 w-5" />
+              Todos os Usuários ({isLoading ? '...' : filteredUsers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: `${colors.purple}20` }}>
+                  <Loader2 className="h-8 w-8 animate-spin" style={{ color: colors.purple }} />
+                </div>
+                <p className="font-medium" style={{ color: colors.black }}>Carregando usuários...</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredUsers.map((user) => (
+                  <Collapsible
+                    key={user.id}
+                    open={expandedUsers.has(user.id)}
+                    onOpenChange={() => toggleUserExpansion(user.id)}
+                  >
+                    <div className="border rounded-lg" style={{ borderColor: colors.gray_ultra_light }}>
+                      <CollapsibleTrigger asChild>
+                        <div className="flex items-center justify-between p-4 hover:opacity-75 cursor-pointer">
+                          <div className="flex items-center space-x-4">
+                            <Button variant="ghost" size="sm" className="p-0 h-auto bg-transparent">
+                              {expandedUsers.has(user.id) ? (
+                                <ChevronDown className="h-4 w-4" style={{ color: colors.purple }} />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" style={{ color: colors.gray_light }} />
+                              )}
+                            </Button>
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
+                                <UsersIcon className="h-5 w-5 text-white" />
+                              </div>
+                              <div>
+                                <p className="font-semibold" style={{ color: colors.black }}>{user.name}</p>
+                                <p className="text-sm" style={{ color: colors.gray_light }}>{user.email}</p>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-4">
+                            <div className="flex items-center gap-1">
+                              {user.status === 'Administrador' && <Crown className="h-3 w-3" style={{ color: colors.yellow }} />}
+                              <Badge style={{
+                                backgroundColor: user.status === 'Administrador' ? colors.yellow : colors.green,
+                                color: 'white',
+                                border: 'none'
+                              }}>
+                                {user.status}
+                              </Badge>
+                            </div>
+                            
+                            <div className="text-center px-3 py-1 rounded-md min-w-[60px]" style={{ backgroundColor: colors.background }}>
+                              <p className="font-semibold text-sm" style={{ color: colors.black }}>{user.totalPets}</p>
+                              <p className="text-xs" style={{ color: colors.gray_light }}>pets</p>
+                            </div>
+                            
+                            <div className="text-center px-3 py-1 rounded-md min-w-[60px]" style={{ backgroundColor: colors.background }}>
+                              <p className="font-semibold text-sm" style={{ color: colors.green }}>{user.activePlans}</p>
+                              <p className="text-xs" style={{ color: colors.gray_light }}>planos</p>
+                            </div>
+                            
+                            <div className="text-center px-3 py-1 rounded-md min-w-[80px]" style={{ backgroundColor: colors.background }}>
+                              <p className="text-xs mb-1" style={{ color: colors.gray_light }}>Cadastro</p>
+                              <p className="font-medium text-xs" style={{ color: colors.black }}>{formatDate(user.createdAt)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent>
+                        <div className="px-4 pb-4 border-t" style={{ 
+                          borderColor: colors.gray_ultra_light,
+                          backgroundColor: colors.background 
+                        }}>
+                          <div className="pt-4">
+                            <div className="flex items-center gap-2 mb-4">
+                              <PawPrint className="h-4 w-4" style={{ color: colors.purple }} />
+                              <h3 className="font-semibold" style={{ color: colors.black }}>
+                                Pets de {user.name} ({user.pets.length})
+                              </h3>
+                            </div>
+                            
+                            {user.pets.length === 0 ? (
+                              <div className="text-center py-8 rounded-lg" style={{ backgroundColor: colors.background }}>
+                                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: colors.background }}>
+                                  <PawPrint className="h-8 w-8" style={{ color: colors.gray_light }} />
+                                </div>
+                                <h4 className="font-medium mb-2" style={{ color: colors.black }}>Nenhum pet cadastrado</h4>
+                                <p className="text-sm" style={{ color: colors.gray_light }}>Este usuário ainda não possui pets registrados</p>
+                              </div>
+                            ) : (
+                              <div>
+                                {user.pets.map((pet) => (
+                                  <PetDetails key={pet.id_pet} pet={pet} />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </div>
+                  </Collapsible>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
