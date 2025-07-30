@@ -18,57 +18,71 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Search, Download, Filter } from 'lucide-react';
-
-const mockPayments = [
-  { 
-    id: 'PAY-001', 
-    user: 'Sarah Johnson', 
-    amount: '$49.99', 
-    plan: 'Premium', 
-    status: 'completed', 
-    date: '2024-01-28',
-    method: 'Credit Card'
-  },
-  { 
-    id: 'PAY-002', 
-    user: 'Mike Chen', 
-    amount: '$19.99', 
-    plan: 'Basic', 
-    status: 'completed', 
-    date: '2024-01-27',
-    method: 'PayPal'
-  },
-  { 
-    id: 'PAY-003', 
-    user: 'Emma Davis', 
-    amount: '$29.99', 
-    plan: 'Pro', 
-    status: 'pending', 
-    date: '2024-01-26',
-    method: 'Credit Card'
-  },
-  { 
-    id: 'PAY-004', 
-    user: 'Alex Wilson', 
-    amount: '$49.99', 
-    plan: 'Premium', 
-    status: 'failed', 
-    date: '2024-01-25',
-    method: 'Credit Card'
-  }
-];
+import { Search, Download } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getPaymentStats } from '@/services/get-payment-stats';
+import { getPaymentsList } from '@/services/get-payments-list';
 
 export function Payments() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage] = useState(1);
+  const [pageSize] = useState(10);
 
-  const filteredPayments = mockPayments.filter(payment => {
-    const matchesSearch = payment.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const { data: paymentStats, isLoading: isLoadingStats } = useQuery({
+    queryKey: ['payment-stats'],
+    queryFn: getPaymentStats,
   });
+
+  const { data: paymentsData, isLoading: isLoadingPayments } = useQuery({
+    queryKey: ['payments-list', currentPage, pageSize],
+    queryFn: () => getPaymentsList(currentPage, pageSize),
+  });
+
+  // Função para formatar valor monetário
+  const formatCurrency = (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  // Função para formatar data
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
+
+  // Função para traduzir status
+  const translateStatus = (status: string): string => {
+    const statusMap: { [key: string]: string } = {
+      'pendente': 'pending',
+      'completed': 'completed',
+      'failed': 'failed',
+      'cancelled': 'cancelled'
+    };
+    return statusMap[status] || status;
+  };
+
+  // Função para traduzir método de pagamento
+  const translatePaymentMethod = (method: string): string => {
+    const methodMap: { [key: string]: string } = {
+      'credit_card': 'Cartão de Crédito',
+      'debit_card': 'Cartão de Débito',
+      'pix': 'PIX',
+      'boleto': 'Boleto',
+      'paypal': 'PayPal'
+    };
+    return methodMap[method] || method;
+  };
+
+  const filteredPayments = paymentsData?.data.filter(payment => {
+    const matchesSearch = payment.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         payment.paymentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         payment.userEmail.toLowerCase().includes(searchTerm.toLowerCase());
+    const translatedStatus = translateStatus(payment.status);
+    const matchesStatus = statusFilter === 'all' || translatedStatus === statusFilter;
+    return matchesSearch && matchesStatus;
+  }) || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,30 +113,47 @@ export function Payments() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">$47,250</div>
-            <p className="text-sm text-gray-600">Total Revenue</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">2,847</div>
-            <p className="text-sm text-gray-600">Completed</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-sm text-gray-600">Pending</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-sm text-gray-600">Failed</p>
-          </CardContent>
-        </Card>
+        {isLoadingStats ? (
+          // Skeleton para stats
+          [...Array(4)].map((_, index) => (
+            <Card key={index}>
+              <CardContent className="pt-6">
+                <div className="h-8 w-20 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{formatCurrency(paymentStats?.totalRevenue || 0)}</div>
+                <p className="text-sm text-gray-600">Total Revenue</p>
+                {paymentStats?.revenueGrowth && (
+                  <p className="text-xs text-green-600 mt-1">{paymentStats.revenueGrowth}</p>
+                )}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{paymentStats?.completedCount || 0}</div>
+                <p className="text-sm text-gray-600">Completed</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{paymentStats?.pendingCount || 0}</div>
+                <p className="text-sm text-gray-600">Pending</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold">{paymentStats?.failedCount || 0}</div>
+                <p className="text-sm text-gray-600">Failed</p>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* Filters */}
@@ -159,41 +190,72 @@ export function Payments() {
           <CardTitle>Transaction History ({filteredPayments.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Payment ID</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPayments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-mono text-sm">{payment.id}</TableCell>
-                  <TableCell className="font-medium">{payment.user}</TableCell>
-                  <TableCell className="font-semibold">{payment.amount}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{payment.plan}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={payment.status === 'completed' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}
-                      style={getStatusColor(payment.status)}
-                    >
-                      {payment.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-600">{payment.method}</TableCell>
-                  <TableCell className="text-gray-600">{payment.date}</TableCell>
-                </TableRow>
+          {isLoadingPayments ? (
+            // Skeleton para tabela
+            <div className="space-y-4">
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="flex items-center space-x-4 py-4 border-b">
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Payment ID</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPayments.length > 0 ? (
+                  filteredPayments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell className="font-mono text-sm">{payment.paymentId}</TableCell>
+                      <TableCell className="font-medium">{payment.userName}</TableCell>
+                      <TableCell className="text-gray-600">{payment.userEmail}</TableCell>
+                      <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{payment.planName}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={
+                            translateStatus(payment.status) === 'completed' ? 'default' : 
+                            translateStatus(payment.status) === 'pending' ? 'secondary' : 
+                            'destructive'
+                          }
+                          style={getStatusColor(translateStatus(payment.status))}
+                        >
+                          {translateStatus(payment.status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{translatePaymentMethod(payment.paymentMethod)}</TableCell>
+                      <TableCell className="text-gray-600">{formatDate(payment.paymentDate)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                      Nenhum pagamento encontrado
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
