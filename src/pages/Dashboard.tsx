@@ -278,7 +278,7 @@ export function Dashboard() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold">Analytics Detalhado</h2>
+            <h2 className="text-2xl font-bold">Análise Detalhada</h2>
             <p className="text-gray-600 mt-1">
               Análise aprofundada dos dados da plataforma
               <span className="ml-2 text-sm text-gray-500">

@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from "@/lib/api-routes";
+import { REPORTS_ROUTE, REPORTS_STATISTICS_ROUTE, REPORTS_MY_ROUTE } from "@/lib/api-routes";
 import { api } from "@/lib/api";
 import { 
   Report, 
@@ -23,14 +23,14 @@ export const reportsService = {
     });
     
     const response = await api.get<ReportsResponse>(
-      `${API_ENDPOINTS.REPORTS}?${params.toString()}`
+      `${REPORTS_ROUTE()}?${params.toString()}`
     );
     return response.data;
   },
 
   // Get reports statistics
   async getStatistics(): Promise<ReportStatistics> {
-    const response = await api.get<ReportStatistics>(API_ENDPOINTS.REPORTS_STATISTICS);
+    const response = await api.get<ReportStatistics>(REPORTS_STATISTICS_ROUTE());
     return response.data;
   },
 
@@ -42,37 +42,37 @@ export const reportsService = {
     });
     
     const response = await api.get<ReportsResponse>(
-      `${API_ENDPOINTS.REPORTS_MY}?${params.toString()}`
+      `${REPORTS_MY_ROUTE()}?${params.toString()}`
     );
     return response.data;
   },
 
   // Get single report by ID
   async getReport(id: string): Promise<Report> {
-    const response = await api.get<Report>(`${API_ENDPOINTS.REPORTS}/${id}`);
+    const response = await api.get<Report>(`${REPORTS_ROUTE()}/${id}`);
     return response.data;
   },
 
   // Create new report
   async createReport(data: CreateReportDto): Promise<Report> {
-    const response = await api.post<Report>(API_ENDPOINTS.REPORTS, data);
+    const response = await api.post<Report>(REPORTS_ROUTE(), data);
     return response.data;
   },
 
   // Update report (admin only)
   async updateReport(id: string, data: UpdateReportDto): Promise<Report> {
-    const response = await api.patch<Report>(`${API_ENDPOINTS.REPORTS}/${id}`, data);
+    const response = await api.patch<Report>(`${REPORTS_ROUTE()}/${id}`, data);
     return response.data;
   },
 
   // Delete report (admin only)
   async deleteReport(id: string): Promise<void> {
-    await api.delete(`${API_ENDPOINTS.REPORTS}/${id}`);
+    await api.delete(`${REPORTS_ROUTE()}/${id}`);
   },
 
   // Respond to a report (admin only)
   async respondToReport(id: string, response: string): Promise<Report> {
-    const response_data = await api.patch<Report>(`${API_ENDPOINTS.REPORTS}/${id}`, {
+    const response_data = await api.patch<Report>(`${REPORTS_ROUTE()}/${id}`, {
       status: 'in_progress',
       adminResponse: response,
       respondedBy: 'Admin', // This should come from auth context
@@ -82,7 +82,7 @@ export const reportsService = {
 
   // Complete/Resolve a report (admin only)
   async completeReport(id: string, response?: string): Promise<Report> {
-    const response_data = await api.patch<Report>(`${API_ENDPOINTS.REPORTS}/${id}`, {
+    const response_data = await api.patch<Report>(`${REPORTS_ROUTE()}/${id}`, {
       status: 'resolved',
       ...(response && { adminResponse: response }),
       respondedBy: 'Admin', // This should come from auth context
@@ -92,7 +92,7 @@ export const reportsService = {
 
   // Change report status
   async updateReportStatus(id: string, status: 'pending' | 'in_progress' | 'resolved' | 'closed' | 'rejected'): Promise<Report> {
-    const response = await api.patch<Report>(`${API_ENDPOINTS.REPORTS}/${id}`, {
+    const response = await api.patch<Report>(`${REPORTS_ROUTE()}/${id}`, {
       status,
     });
     return response.data;
