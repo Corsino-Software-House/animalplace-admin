@@ -1,12 +1,34 @@
 import { StatsCard } from '@/components/ui/stats-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, CreditCard, Package, Calendar, User, DollarSign, CalendarDays, Settings } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Users, 
+  CreditCard, 
+  Package, 
+  Calendar, 
+  User, 
+  DollarSign, 
+  CalendarDays, 
+  Settings,
+  BarChart3,
+  TrendingUp,
+  AlertCircle,
+  RefreshCw
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getDashboardOverview } from '@/services/get-dashboard-overview';
 import { getRecentActivity } from '@/services/get-recent-activity';
+import { getSubscriptionMetrics } from '@/services/get-subscription-metrics';
+import { getSchedulingMetrics } from '@/services/get-scheduling-metrics';
+import { getServiceMetrics } from '@/services/get-service-metrics';
+import { useState } from 'react';
 
 export function Dashboard() {
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ['dashboard-overview'],
     queryFn: getDashboardOverview,
@@ -16,6 +38,33 @@ export function Dashboard() {
     queryKey: ['recent-activity'],
     queryFn: getRecentActivity,
   });
+
+  const { data: subscriptionMetrics, isLoading: isLoadingSubscriptions } = useQuery({
+    queryKey: ['subscription-metrics'],
+    queryFn: getSubscriptionMetrics,
+  });
+
+  const { data: schedulingMetrics, isLoading: isLoadingScheduling } = useQuery({
+    queryKey: ['scheduling-metrics'],
+    queryFn: getSchedulingMetrics,
+  });
+
+  const { data: serviceMetrics, isLoading: isLoadingServices } = useQuery({
+    queryKey: ['service-metrics'],
+    queryFn: getServiceMetrics,
+  });
+
+  const refreshData = () => {
+    setLastUpdated(new Date());
+  };
+
+  // Função para formatar valores monetários
+  const formatCurrency = (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
 
   // Função para mapear ícones baseado no tipo
   const getActivityIcon = (iconType: string) => {
@@ -38,14 +87,6 @@ export function Dashboard() {
     if (growth.includes('+') && growth.includes('%')) return 'positive';
     if (growth.includes('-') && growth.includes('%')) return 'negative';
     return 'neutral';
-  };
-
-  // Função para formatar valores monetários
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
   };
 
   if (isLoading) {
@@ -185,11 +226,11 @@ export function Dashboard() {
       </div>
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
+      <div className="grid grid-cols-1 gap-6">
+        {/* Recent Activity - Largura completa */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Atividades Recentes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -231,36 +272,295 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="mr-2 h-4 w-4" />
-                Add New User
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Package className="mr-2 h-4 w-4" />
-                Create New Plan
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Calendar className="mr-2 h-4 w-4" />
-                Schedule Appointment
-              </Button>
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                style={{ borderColor: '#95CA3C', color: '#95CA3C' }}
-              >
-                <CreditCard className="mr-2 h-4 w-4" />
-                Process Payment
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      </div>
+
+      {/* Analytics Detalhado - Integrado com APIs reais */}
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold">Análise Detalhada</h2>
+            <p className="text-gray-600 mt-1">
+              Análise aprofundada dos dados da plataforma
+              <span className="ml-2 text-sm text-gray-500">
+                • Última atualização: {lastUpdated.toLocaleTimeString('pt-BR')}
+              </span>
+            </p>
+          </div>
+          <Button variant="outline" onClick={refreshData}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Atualizar
+          </Button>
+        </div>
+
+        <Tabs defaultValue="subscriptions" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="subscriptions">Assinaturas</TabsTrigger>
+            <TabsTrigger value="scheduling">Agendamentos</TabsTrigger>
+            <TabsTrigger value="services">Serviços</TabsTrigger>
+          </TabsList>
+
+          {/* Subscriptions Tab */}
+          <TabsContent value="subscriptions" className="space-y-6">
+            {isLoadingSubscriptions ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-2 w-full bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : subscriptionMetrics ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      Crescimento de Assinaturas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-gray-600">Este mês</span>
+                          <span className="text-lg font-semibold">{subscriptionMetrics.newSubscriptionsThisMonth}</span>
+                        </div>
+                        <Progress value={Math.min(subscriptionMetrics.growthPercentage, 100)} className="h-2" />
+                        <p className="text-xs text-green-600 mt-1">
+                          {subscriptionMetrics.growthPercentage > 0 ? '+' : ''}{subscriptionMetrics.growthPercentage.toFixed(1)}% vs mês anterior
+                        </p>
+                      </div>
+                      <div className="pt-4 border-t">
+                        <div className="text-2xl font-bold text-center">
+                          {subscriptionMetrics.activeSubscriptions}
+                        </div>
+                        <p className="text-sm text-gray-600 text-center">Assinaturas Ativas</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5" />
+                      Status de Pagamentos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Pendentes</span>
+                        <Badge variant="outline" className="text-orange-600">
+                          {subscriptionMetrics.pendingPayments}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Em atraso</span>
+                        <Badge variant="destructive">
+                          {subscriptionMetrics.overduePayments}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Em dia</span>
+                        <Badge className="bg-green-100 text-green-800">
+                          {subscriptionMetrics.activeSubscriptions - subscriptionMetrics.pendingPayments - subscriptionMetrics.overduePayments}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribuição de Planos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {subscriptionMetrics.planDistribution && subscriptionMetrics.planDistribution.length > 0 ? (
+                        subscriptionMetrics.planDistribution.map((plan) => (
+                          <div key={plan.name} className="flex items-center gap-3">
+                            <div 
+                              className="w-3 h-3 rounded"
+                              style={{ backgroundColor: plan.color }}
+                            ></div>
+                            <span className="text-sm flex-1">{plan.name}</span>
+                            <span className="text-sm font-medium">{plan.percentage}%</span>
+                            <span className="text-xs text-gray-500">({plan.count})</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          <p className="text-sm">Nenhum plano encontrado</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Dados de assinaturas não disponíveis</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Scheduling Tab */}
+          <TabsContent value="scheduling" className="space-y-6">
+            {isLoadingScheduling ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[...Array(2)].map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : schedulingMetrics ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Agendamentos do Mês
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold">{schedulingMetrics.totalSchedulesThisMonth}</div>
+                        <p className="text-sm text-gray-600">Total este mês</p>
+                        <p className="text-xs text-green-600 mt-1">
+                          {schedulingMetrics.growthPercentage > 0 ? '+' : ''}{schedulingMetrics.growthPercentage.toFixed(1)}% vs mês anterior
+                        </p>
+                      </div>
+                      <Progress value={Math.min((schedulingMetrics.totalSchedulesThisMonth / 170) * 100, 100)} className="h-2" />
+                      <p className="text-xs text-center text-gray-500">Meta mensal: 170 agendamentos</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Status dos Agendamentos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600">{schedulingMetrics.scheduledCount}</div>
+                        <p className="text-xs text-gray-600">Agendados</p>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">{schedulingMetrics.completedCount}</div>
+                        <p className="text-xs text-gray-600">Realizados</p>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-red-600">{schedulingMetrics.cancelledCount}</div>
+                        <p className="text-xs text-gray-600">Cancelados</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Dados de agendamentos não disponíveis</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Services Tab */}
+          <TabsContent value="services" className="space-y-6">
+            {isLoadingServices ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[...Array(2)].map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                        {[...Array(3)].map((_, j) => (
+                          <div key={j} className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : serviceMetrics ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Serviços Mais Utilizados
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {serviceMetrics.mostUsedServices.map((service, index) => (
+                        <div key={service.name} className="flex items-center gap-3">
+                          <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">{service.name}</span>
+                              <span className="text-sm text-gray-600">{service.count}</span>
+                            </div>
+                            <Progress 
+                              value={(service.count / serviceMetrics.mostUsedServices[0].count) * 100} 
+                              className="h-1 mt-1" 
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Distribuição por Tipo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="text-center mb-4">
+                        <div className="text-2xl font-bold">{serviceMetrics.totalServicesThisMonth}</div>
+                        <p className="text-sm text-gray-600">Serviços realizados este mês</p>
+                      </div>
+                      {serviceMetrics.servicesByType.map((type) => (
+                        <div key={type.type} className="flex justify-between items-center">
+                          <span className="text-sm">{type.type}</span>
+                          <div className="flex items-center gap-2">
+                            <Progress 
+                              value={(type.count / serviceMetrics.totalServicesThisMonth) * 100} 
+                              className="h-2 w-20" 
+                            />
+                            <span className="text-sm font-medium w-12">{type.count}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Dados de serviços não disponíveis</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
