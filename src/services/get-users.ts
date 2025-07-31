@@ -1,8 +1,8 @@
-import { API_ENDPOINTS } from "@/lib/api-routes";
+import { GET_USERS_ROUTE } from "@/lib/api-routes";
 import { api } from "@/lib/api";
 import { User } from "@/types/users";
 
 export const getUsers = async (): Promise<User[]> => {
-  const response = await api.get<User[]>(API_ENDPOINTS.GET_USERS);
+  const response = await api.get<User[]>(GET_USERS_ROUTE());
   return response.data;
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { API_ENDPOINTS } from '@/lib/api-routes';
+import { LOGIN_ROUTE, REGISTER_ROUTE } from '@/lib/api-routes';
 import { LoginData, LoginResponse, RegisterData } from '@/types/auth';
 import { toast } from 'sonner';
 
@@ -22,7 +22,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async (data: LoginData): Promise<LoginResponse> => {
-      const response = await api.post(API_ENDPOINTS.LOGIN, data);
+      const response = await api.post(LOGIN_ROUTE(), data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -44,7 +44,7 @@ export const useLogin = () => {
 export const useRegister = () => {
   return useMutation({
     mutationFn: async (data: RegisterData): Promise<RegisterResponse> => {
-      const response = await api.post(API_ENDPOINTS.REGISTER, data);
+      const response = await api.post(REGISTER_ROUTE(), data);
       return response.data;
     },
     onSuccess: () => {
