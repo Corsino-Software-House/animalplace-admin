@@ -13,10 +13,18 @@ export const REPORTS_MY_ROUTE = () => '/api/reports/my-reports';
 export const LOGIN_ROUTE = () => '/api/auth/login';
 
 export const REGISTER_ROUTE = () => '/api/auth/register';
+export const VERIFY_EMAIL_CODE_ROUTE = () => '/api/auth/verify-email-code';
+export const RESEND_VERIFICATION_ROUTE = () => '/api/auth/resend-verification';
 
 export const GET_USERS_ROUTE = () => '/api/users';
 
 export const BANNERS_ROUTE = () => '/api/banners';
+
+// Cashback endpoints
+export const CASHBACK_STATISTICS_ROUTE = () => '/api/cashback/admin/statistics';
+export const CASHBACK_TRANSACTIONS_ROUTE = () => '/api/cashback/admin/transactions';
+export const CASHBACK_APPROVE_TRANSACTION_ROUTE = (id: string) => `/api/cashback/admin/transactions/${id}/approve`;
+export const CASHBACK_DECLINE_TRANSACTION_ROUTE = (id: string) => `/api/cashback/admin/transactions/${id}/decline`;
 
 export const GET_ONE_BANNER_ROUTE = (id: string) => `/api/banners/${id}`;
 
