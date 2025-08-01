@@ -20,4 +20,4 @@ export const cashbackService = {
     );
     return response.data;
   }
-};
+}

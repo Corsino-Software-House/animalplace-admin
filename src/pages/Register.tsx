@@ -18,7 +18,6 @@ export default function Register() {
   const [registerData, setRegisterData] = useState({
     name: '',
     email: '',
-    rg: '',
     cpf: '',
     endereco_completo: '',
     cep: '',
@@ -59,10 +58,14 @@ export default function Register() {
       
       toast({
         title: "Cadastro realizado com sucesso",
-        description: "Sua conta foi criada. Agora você pode fazer login.",
+        description: "Enviamos um código de verificação para seu email.",
       });
       
-      navigate('/login');
+      // Redireciona para a página de verificação com o email
+      navigate('/verify-email', { 
+        state: { email: registerData.email },
+        replace: true 
+      });
     } catch (error) {
       console.error('Erro no cadastro:', error);
       toast({
@@ -176,42 +179,22 @@ export default function Register() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rg" className="text-sm font-medium">
-                    RG
-                  </Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="rg"
-                      type="text"
-                      placeholder="12.345.678-9"
-                      value={registerData.rg}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, rg: e.target.value }))}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cpf" className="text-sm font-medium">
-                    CPF
-                  </Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="cpf"
-                      type="text"
-                      placeholder="000.000.000-00"
-                      value={registerData.cpf}
-                      onChange={handleCPFChange}
-                      className="pl-10"
-                      maxLength={14}
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="cpf" className="text-sm font-medium">
+                  CPF
+                </Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    id="cpf"
+                    type="text"
+                    placeholder="000.000.000-00"
+                    value={registerData.cpf}
+                    onChange={handleCPFChange}
+                    className="pl-10"
+                    maxLength={14}
+                    required
+                  />
                 </div>
               </div>
 
