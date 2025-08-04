@@ -67,21 +67,21 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
   if (!isOpen || !report) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="flex items-center space-x-2">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <Card className="w-full max-w-4xl max-h-[95vh] overflow-y-auto">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
+          <CardTitle className="flex items-center space-x-2 text-lg">
             <StatusIcon status={report.status} />
-            <span>Detalhes do Relatório</span>
+            <span className="truncate">Detalhes do Relatório</span>
           </CardTitle>
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="outline" size="sm" onClick={onClose} className="self-end sm:self-center">
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {/* Header with badges */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
               <Badge className={statusColors[report.status]}>
                 {statusLabels[report.status]}
               </Badge>
@@ -95,20 +95,20 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
 
             {/* Title and Description */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 break-words">
                 {report.title}
               </h3>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-wrap break-words">
                 {report.description}
               </p>
             </div>
 
             {/* User Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
+                <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
                     {report.user?.name || 'Usuário Anônimo'}
                   </p>
                   <p className="text-xs text-gray-500">Reportado por</p>
@@ -117,9 +117,9 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
 
               {report.contactEmail && (
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
+                  <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
                       {report.contactEmail}
                     </p>
                     <p className="text-xs text-gray-500">Email de contato</p>
@@ -183,8 +183,8 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
             )}
           </div>
 
-          <div className="flex justify-end pt-6">
-            <Button onClick={onClose}>
+          <div className="flex justify-center sm:justify-end pt-6">
+            <Button onClick={onClose} className="w-full sm:w-auto">
               Fechar
             </Button>
           </div>

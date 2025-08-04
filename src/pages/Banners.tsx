@@ -175,19 +175,19 @@ export function Banners() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen p-2 sm:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
-              <ImageIcon className="h-6 w-6 text-white" />
+        <div className="text-center mb-6 lg:mb-8">
+          <div className="flex items-center justify-center gap-2 lg:gap-3 mb-3 lg:mb-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
+              <ImageIcon className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold" style={{ color: colors.black }}>
+            <h1 className="text-2xl lg:text-3xl font-bold" style={{ color: colors.black }}>
               Gerenciar Banners
             </h1>
           </div>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: colors.gray_light }}>
+          <p className="text-base lg:text-lg max-w-2xl mx-auto px-4" style={{ color: colors.gray_light }}>
             Gerencie banners promocionais exibidos no aplicativo do cliente
           </p>
         </div>
@@ -200,7 +200,7 @@ export function Banners() {
                 Criar Banner
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle style={{ color: colors.black }}>Criar Novo Banner</DialogTitle>
               </DialogHeader>
@@ -237,7 +237,7 @@ export function Banners() {
                     placeholder="https://exemplo.com/destino"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium" style={{ color: colors.gray_light }}>Data de Início</label>
                     <Input
@@ -308,7 +308,7 @@ export function Banners() {
                 <p className="font-medium" style={{ color: colors.black }}>Carregando banners...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 {bannersData?.map((banner) => {
                   const status = getStatusBadge(banner);
                   return (
@@ -402,7 +402,7 @@ export function Banners() {
         </Card>
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle style={{ color: colors.black }}>Editar Banner</DialogTitle>
             </DialogHeader>
@@ -439,7 +439,7 @@ export function Banners() {
                   placeholder="https://exemplo.com/destino"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium" style={{ color: colors.gray_light }}>Data de Início</label>
                   <Input

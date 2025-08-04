@@ -67,11 +67,11 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Criar Novo Relatório</CardTitle>
-          <Button variant="outline" size="sm" onClick={handleClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
+          <CardTitle className="text-lg">Criar Novo Relatório</CardTitle>
+          <Button variant="outline" size="sm" onClick={handleClose} className="self-end sm:self-center">
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
@@ -117,7 +117,7 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="contactEmail">Email de Contato</Label>
                 <Input
@@ -140,14 +140,14 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={handleClose}>
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+              <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
                 Cancelar
               </Button>
               <Button 
                 type="submit" 
                 style={{ backgroundColor: '#95CA3C' }}
-                className="text-white hover:opacity-90"
+                className="text-white hover:opacity-90 w-full sm:w-auto"
                 disabled={createReportMutation.isPending || !title.trim() || !description.trim()}
               >
                 {createReportMutation.isPending ? (

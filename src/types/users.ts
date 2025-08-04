@@ -25,6 +25,16 @@ export interface UserPet {
   planAtivo?: UserPlan;
 }
 
+export interface UserPlanDetails {
+  id: string;
+  name: string;
+  description: string;
+  suggestedPrice: string;
+  duration: number;
+  isActive: boolean;
+  mainColor: string;
+}
+
 export interface UserPlan {
   id_subscription: string;
   status: string;
@@ -33,15 +43,5 @@ export interface UserPlan {
   due_date: string;
   last_payment_date: string | null;
   next_payment_date: string;
-  plan: UserPlan;
-}
-
-export interface UserPlan {
-  id: string;
-  name: string;
-  description: string;
-  suggestedPrice: string;
-  duration: number;
-  isActive: boolean;
-  mainColor: string;
+  plan: UserPlanDetails;
 }

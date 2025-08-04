@@ -98,21 +98,21 @@ export function Payments() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Payments</h1>
-          <p className="text-gray-600 mt-2">Track all transactions and payment history</p>
+          <h1 className="text-2xl lg:text-3xl font-bold">Payments</h1>
+          <p className="text-gray-600 mt-2 text-sm lg:text-base">Track all transactions and payment history</p>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" className="self-start lg:self-center">
           <Download className="mr-2 h-4 w-4" />
           Export
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {isLoadingStats ? (
           // Skeleton para stats
           [...Array(4)].map((_, index) => (
@@ -159,8 +159,8 @@ export function Payments() {
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex space-x-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search payments..."
@@ -170,7 +170,7 @@ export function Payments() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -206,29 +206,35 @@ export function Payments() {
               ))}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Payment ID</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Method</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[120px]">Payment ID</TableHead>
+                    <TableHead className="min-w-[150px]">User</TableHead>
+                    <TableHead className="min-w-[200px] hidden lg:table-cell">Email</TableHead>
+                    <TableHead className="min-w-[100px]">Amount</TableHead>
+                    <TableHead className="min-w-[120px] hidden md:table-cell">Plan</TableHead>
+                    <TableHead className="min-w-[100px]">Status</TableHead>
+                    <TableHead className="min-w-[120px] hidden lg:table-cell">Method</TableHead>
+                    <TableHead className="min-w-[100px]">Date</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {filteredPayments.length > 0 ? (
                   filteredPayments.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell className="font-mono text-sm">{payment.paymentId}</TableCell>
-                      <TableCell className="font-medium">{payment.userName}</TableCell>
-                      <TableCell className="text-gray-600">{payment.userEmail}</TableCell>
-                      <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{payment.planName}</Badge>
+                      <TableCell className="font-mono text-xs lg:text-sm">{payment.paymentId.substring(0, 8)}...</TableCell>
+                      <TableCell className="font-medium">
+                        <div>
+                          <div className="font-medium">{payment.userName}</div>
+                          <div className="text-xs text-gray-500 lg:hidden">{payment.userEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-gray-600 hidden lg:table-cell">{payment.userEmail}</TableCell>
+                      <TableCell className="font-semibold text-xs lg:text-sm">{formatCurrency(payment.amount)}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant="outline" className="text-xs">{payment.planName}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge 
@@ -238,12 +244,13 @@ export function Payments() {
                             'destructive'
                           }
                           style={getStatusColor(translateStatus(payment.status))}
+                          className="text-xs"
                         >
                           {translateStatus(payment.status)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-600">{translatePaymentMethod(payment.paymentMethod)}</TableCell>
-                      <TableCell className="text-gray-600">{formatDate(payment.paymentDate)}</TableCell>
+                      <TableCell className="text-gray-600 hidden lg:table-cell text-xs">{translatePaymentMethod(payment.paymentMethod)}</TableCell>
+                      <TableCell className="text-gray-600 text-xs">{formatDate(payment.paymentDate)}</TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -255,6 +262,7 @@ export function Payments() {
                 )}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

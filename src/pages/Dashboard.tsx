@@ -97,7 +97,7 @@ export function Dashboard() {
           <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
         </div>
         {/* Stats Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {[...Array(4)].map((_, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -112,7 +112,7 @@ export function Dashboard() {
           ))}
         </div>
         {/* Content Grid Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Recent Activity Skeleton */}
           <Card>
             <CardHeader>
@@ -186,15 +186,15 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
+      <div className="text-center lg:text-left">
+        <h1 className="text-2xl lg:text-3xl font-bold">Dashboard</h1>
+        <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatsCard
           title="Total Users"
           value={dashboardData?.totalUsers.value || 0}
@@ -226,7 +226,7 @@ export function Dashboard() {
       </div>
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:gap-6">
         {/* Recent Activity - Largura completa */}
         <Card>
           <CardHeader>
@@ -275,34 +275,35 @@ export function Dashboard() {
       </div>
 
       {/* Analytics Detalhado - Integrado com APIs reais */}
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="space-y-4 lg:space-y-6">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold">Análise Detalhada</h2>
-            <p className="text-gray-600 mt-1">
+            <h2 className="text-xl lg:text-2xl font-bold">Análise Detalhada</h2>
+            <p className="text-gray-600 mt-1 text-sm lg:text-base">
               Análise aprofundada dos dados da plataforma
-              <span className="ml-2 text-sm text-gray-500">
+              <span className="ml-2 text-sm text-gray-500 block lg:inline">
                 • Última atualização: {lastUpdated.toLocaleTimeString('pt-BR')}
               </span>
             </p>
           </div>
-          <Button variant="outline" onClick={refreshData}>
+          <Button variant="outline" onClick={refreshData} className="self-start lg:self-center">
             <RefreshCw className="mr-2 h-4 w-4" />
             Atualizar
           </Button>
         </div>
 
-        <Tabs defaultValue="subscriptions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="subscriptions">Assinaturas</TabsTrigger>
-            <TabsTrigger value="scheduling">Agendamentos</TabsTrigger>
-            <TabsTrigger value="services">Serviços</TabsTrigger>
+        <Tabs defaultValue="subscriptions" className="space-y-4 lg:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+            <TabsTrigger value="subscriptions" className="text-xs lg:text-sm py-2">Assinaturas</TabsTrigger>
+            <TabsTrigger value="scheduling" className="text-xs lg:text-sm py-2">Agendamentos</TabsTrigger>
+            <TabsTrigger value="services" className="text-xs lg:text-sm py-2">Serviços</TabsTrigger>
           </TabsList>
 
+
           {/* Subscriptions Tab */}
-          <TabsContent value="subscriptions" className="space-y-6">
+          <TabsContent value="subscriptions" className="space-y-4 lg:space-y-6">
             {isLoadingSubscriptions ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 {[...Array(3)].map((_, i) => (
                   <Card key={i}>
                     <CardContent className="p-6">
@@ -316,7 +317,7 @@ export function Dashboard() {
                 ))}
               </div>
             ) : subscriptionMetrics ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -412,9 +413,9 @@ export function Dashboard() {
           </TabsContent>
 
           {/* Scheduling Tab */}
-          <TabsContent value="scheduling" className="space-y-6">
+          <TabsContent value="scheduling" className="space-y-4 lg:space-y-6">
             {isLoadingScheduling ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {[...Array(2)].map((_, i) => (
                   <Card key={i}>
                     <CardContent className="p-6">
@@ -427,7 +428,7 @@ export function Dashboard() {
                 ))}
               </div>
             ) : schedulingMetrics ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -455,7 +456,7 @@ export function Dashboard() {
                     <CardTitle>Status dos Agendamentos</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                       <div>
                         <div className="text-2xl font-bold text-blue-600">{schedulingMetrics.scheduledCount}</div>
                         <p className="text-xs text-gray-600">Agendados</p>
@@ -480,9 +481,9 @@ export function Dashboard() {
           </TabsContent>
 
           {/* Services Tab */}
-          <TabsContent value="services" className="space-y-6">
+          <TabsContent value="services" className="space-y-4 lg:space-y-6">
             {isLoadingServices ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {[...Array(2)].map((_, i) => (
                   <Card key={i}>
                     <CardContent className="p-6">
@@ -497,7 +498,7 @@ export function Dashboard() {
                 ))}
               </div>
             ) : serviceMetrics ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">

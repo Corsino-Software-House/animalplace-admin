@@ -20,15 +20,21 @@ export function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
 
-  const { data: users = [], isLoading, error } = useQuery({
+  const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: getUsers,
   });
 
-  const filteredUsers = users.filter(user =>
+  // Garantir que users é sempre um array
+  const safeUsers = users || [];
+
+  const filteredUsers = safeUsers.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).map(user => ({
+    ...user,
+    pets: user.pets || []
+  }));
 
   const toggleUserExpansion = (userId: string) => {
     const newExpanded = new Set(expandedUsers);
@@ -64,7 +70,7 @@ export function Users() {
         </div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <div className="p-3 rounded-md" style={{ backgroundColor: colors.background }}>
           <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>SEXO</p>
           <p className="font-medium" style={{ color: colors.black }}>{pet.sexo}</p>
@@ -104,7 +110,7 @@ export function Users() {
             {pet.castrado ? "Sim" : "Não"}
           </Badge>
         </div>
-        <div className="p-3 rounded-md md:col-span-2" style={{ backgroundColor: colors.background }}>
+        <div className="p-3 rounded-md sm:col-span-2 lg:col-span-2" style={{ backgroundColor: colors.background }}>
           <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>CADASTRADO EM</p>
           <p className="font-medium" style={{ color: colors.black }}>{formatDate(pet.created_at)}</p>
         </div>
@@ -124,7 +130,7 @@ export function Users() {
               <p className="text-sm" style={{ color: colors.gray_light }}>Plano atual do pet</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div>
               <p className="text-xs font-medium mb-1" style={{ color: colors.gray_light }}>NOME DO PLANO</p>
               <p className="font-medium" style={{ color: colors.black }}>
@@ -226,20 +232,43 @@ export function Users() {
     );
   }
 
-  return (
-    <div className="min-h-screen p-6" >
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
-              <UsersIcon className="h-6 w-6 text-white" />
+  // Verificar se os dados estão carregados
+  if (isLoading || !users) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: colors.background }}>
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: `${colors.purple}20` }}>
+                <Loader2 className="h-8 w-8 animate-spin" style={{ color: colors.purple }} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2" style={{ color: colors.black }}>
+                Carregando usuários...
+              </h3>
+              <p className="text-sm" style={{ color: colors.gray_light }}>
+                Aguarde enquanto buscamos os dados
+              </p>
             </div>
-            <h1 className="text-3xl font-bold" style={{ color: colors.black }}>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen p-2 sm:p-4 lg:p-6" >
+      <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
+        {/* Header */}
+        <div className="text-center mb-6 lg:mb-8">
+          <div className="flex items-center justify-center gap-2 lg:gap-3 mb-3 lg:mb-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
+              <UsersIcon className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+            </div>
+            <h1 className="text-2xl lg:text-3xl font-bold" style={{ color: colors.black }}>
               Usuários
             </h1>
           </div>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: colors.gray_light }}>
+          <p className="text-base lg:text-lg max-w-2xl mx-auto px-4" style={{ color: colors.gray_light }}>
             Gerencie todos os usuários registrados, seus pets e planos
           </p>
         </div>
@@ -269,16 +298,8 @@ export function Users() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: `${colors.purple}20` }}>
-                  <Loader2 className="h-8 w-8 animate-spin" style={{ color: colors.purple }} />
-                </div>
-                <p className="font-medium" style={{ color: colors.black }}>Carregando usuários...</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredUsers.map((user) => (
+            <div className="space-y-3">
+              {filteredUsers.map((user) => (
                   <Collapsible
                     key={user.id}
                     open={expandedUsers.has(user.id)}
@@ -286,30 +307,30 @@ export function Users() {
                   >
                     <div className="border rounded-lg" style={{ borderColor: colors.gray_ultra_light }}>
                       <CollapsibleTrigger asChild>
-                        <div className="flex items-center justify-between p-4 hover:opacity-75 cursor-pointer">
-                          <div className="flex items-center space-x-4">
-                            <Button variant="ghost" size="sm" className="p-0 h-auto bg-transparent">
+                        <div className="flex items-center justify-between p-3 lg:p-4 hover:opacity-75 cursor-pointer">
+                          <div className="flex items-center space-x-2 lg:space-x-4 min-w-0 flex-1">
+                            <Button variant="ghost" size="sm" className="p-0 h-auto bg-transparent flex-shrink-0">
                               {expandedUsers.has(user.id) ? (
                                 <ChevronDown className="h-4 w-4" style={{ color: colors.purple }} />
                               ) : (
                                 <ChevronRight className="h-4 w-4" style={{ color: colors.gray_light }} />
                               )}
                             </Button>
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.purple }}>
-                                <UsersIcon className="h-5 w-5 text-white" />
+                            <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                              <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.purple }}>
+                                <UsersIcon className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
                               </div>
-                              <div>
-                                <p className="font-semibold" style={{ color: colors.black }}>{user.name}</p>
-                                <p className="text-sm" style={{ color: colors.gray_light }}>{user.email}</p>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-sm lg:text-base truncate" style={{ color: colors.black }}>{user.name}</p>
+                                <p className="text-xs lg:text-sm truncate" style={{ color: colors.gray_light }}>{user.email}</p>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center space-x-1 lg:space-x-4 flex-shrink-0">
+                            <div className="hidden sm:flex items-center gap-1">
                               {user.status === 'Administrador' && <Crown className="h-3 w-3" style={{ color: colors.yellow }} />}
-                              <Badge style={{
+                              <Badge className="text-xs" style={{
                                 backgroundColor: user.status === 'Administrador' ? colors.yellow : colors.green,
                                 color: 'white',
                                 border: 'none'
@@ -318,17 +339,17 @@ export function Users() {
                               </Badge>
                             </div>
                             
-                            <div className="text-center px-3 py-1 rounded-md min-w-[60px]" style={{ backgroundColor: colors.background }}>
-                              <p className="font-semibold text-sm" style={{ color: colors.black }}>{user.totalPets}</p>
-                              <p className="text-xs" style={{ color: colors.gray_light }}>pets</p>
+                            <div className="text-center px-2 lg:px-3 py-1 rounded-md min-w-[50px] lg:min-w-[60px]" style={{ backgroundColor: colors.background }}>
+                              <p className="font-semibold text-xs lg:text-sm" style={{ color: colors.black }}>{user.totalPets}</p>
+                              <p className="text-xs hidden lg:block" style={{ color: colors.gray_light }}>pets</p>
                             </div>
                             
-                            <div className="text-center px-3 py-1 rounded-md min-w-[60px]" style={{ backgroundColor: colors.background }}>
-                              <p className="font-semibold text-sm" style={{ color: colors.green }}>{user.activePlans}</p>
-                              <p className="text-xs" style={{ color: colors.gray_light }}>planos</p>
+                            <div className="text-center px-2 lg:px-3 py-1 rounded-md min-w-[50px] lg:min-w-[60px]" style={{ backgroundColor: colors.background }}>
+                              <p className="font-semibold text-xs lg:text-sm" style={{ color: colors.green }}>{user.activePlans}</p>
+                              <p className="text-xs hidden lg:block" style={{ color: colors.gray_light }}>planos</p>
                             </div>
                             
-                            <div className="text-center px-3 py-1 rounded-md min-w-[80px]" style={{ backgroundColor: colors.background }}>
+                            <div className="text-center px-2 lg:px-3 py-1 rounded-md min-w-[60px] lg:min-w-[80px] hidden md:block" style={{ backgroundColor: colors.background }}>
                               <p className="text-xs mb-1" style={{ color: colors.gray_light }}>Cadastro</p>
                               <p className="font-medium text-xs" style={{ color: colors.black }}>{formatDate(user.createdAt)}</p>
                             </div>
@@ -337,11 +358,24 @@ export function Users() {
                       </CollapsibleTrigger>
                       
                       <CollapsibleContent>
-                        <div className="px-4 pb-4 border-t" style={{ 
+                        <div className="px-3 lg:px-4 pb-4 border-t" style={{ 
                           borderColor: colors.gray_ultra_light,
                           backgroundColor: colors.background 
                         }}>
                           <div className="pt-4">
+                            {/* Status mobile - apenas visível em mobile */}
+                            <div className="sm:hidden mb-4 flex justify-center">
+                              <div className="flex items-center gap-1">
+                                {user.status === 'Administrador' && <Crown className="h-3 w-3" style={{ color: colors.yellow }} />}
+                                <Badge className="text-xs" style={{
+                                  backgroundColor: user.status === 'Administrador' ? colors.yellow : colors.green,
+                                  color: 'white',
+                                  border: 'none'
+                                }}>
+                                  {user.status}
+                                </Badge>
+                              </div>
+                            </div>
                             <div className="flex items-center gap-2 mb-4">
                               <PawPrint className="h-4 w-4" style={{ color: colors.purple }} />
                               <h3 className="font-semibold" style={{ color: colors.black }}>
@@ -371,7 +405,6 @@ export function Users() {
                   </Collapsible>
                 ))}
               </div>
-            )}
           </CardContent>
         </Card>
       </div>
