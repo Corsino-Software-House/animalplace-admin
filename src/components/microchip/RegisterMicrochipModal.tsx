@@ -19,9 +19,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Loader2 } from 'lucide-react';
-import { registerMicrochip, RegisterMicrochipRequest } from '@/services/microchip.service';
-import { usePets } from '@/hooks/useMicrochip';
+import { registerMicrochip, RegisterMicrochipRequest, getNotMicrochippedPets } from '@/services/microchip.service';
+// import { usePets } from '@/hooks/useMicrochip';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 
 interface RegisterMicrochipModalProps {
   trigger?: React.ReactNode;
@@ -38,7 +39,10 @@ export function RegisterMicrochipModal({ trigger }: RegisterMicrochipModalProps)
   });
 
   const queryClient = useQueryClient();
-  const { data: pets = [], isLoading: loadingPets } = usePets();
+  const { data: pets = [], isLoading: loadingPets } = useQuery({
+    queryKey: ['not-microchipped-pets'],
+    queryFn: getNotMicrochippedPets,
+  });
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterMicrochipRequest) => registerMicrochip(data),

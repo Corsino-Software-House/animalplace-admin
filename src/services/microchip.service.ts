@@ -74,6 +74,11 @@ export const getAllPets = async (): Promise<Pet[]> => {
   return response.data;
 };
 
+export const getNotMicrochippedPets = async (): Promise<Pet[]> => {
+  const response = await api.get<Pet[]>(`${PETS_ROUTE()}/getAllNotMicrochipedPets`);
+  return response.data;
+};
+
 export const getMicrochippedPets = async (): Promise<MicrochippedPet[]> => {
   const response = await api.get<MicrochippedPet[]>(MICROCHIPPED_PETS_ROUTE());
   return response.data;
