@@ -20,7 +20,6 @@ export const GET_USERS_ROUTE = () => '/api/users';
 
 export const BANNERS_ROUTE = () => '/api/banners';
 
-// Cashback endpoints
 export const CASHBACK_STATISTICS_ROUTE = () => '/api/cashback/admin/statistics';
 export const CASHBACK_TRANSACTIONS_ROUTE = () => '/api/cashback/admin/transactions';
 export const CASHBACK_APPROVE_TRANSACTION_ROUTE = (id: string) => `/api/cashback/admin/transactions/${id}/approve`;
@@ -31,3 +30,11 @@ export const GET_ONE_BANNER_ROUTE = (id: string) => `/api/banners/${id}`;
 export const PLANS_ROUTE = () => '/api/plans';
 
 export const GET_ONE_PLAN_ROUTE = (id: string) => `/api/plans/${id}`;
+
+export const PETS_ROUTE = () => '/api/pet';
+export const GET_ONE_PET_ROUTE = (id: string) => `/api/pet/${id}`;
+export const DELETE_MICROCHIPPED_PET_ROUTE = (id: string) => `/api/pet/${id}/microchip`;
+export const MICROCHIPPED_PETS_ROUTE = () => '/api/pet/getAllMicrochipedPets';
+export const MICROCHIP_STATS_ROUTE = () => '/api/pet/microchip/stats';
+export const SERVICES_ROUTE = () => '/api/services';
+export const SERVICES_USAGE_RECORD_ROUTE = () => '/api/services-usage/record';

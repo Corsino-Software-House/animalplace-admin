@@ -17,71 +17,58 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, MoreHorizontal, Eye, Edit, Trash2, Zap } from 'lucide-react';
-
-const mockMicrochips = [
-  {
-    id: 1,
-    chipId: 'MC001234567890',
-    petName: 'Buddy',
-    petType: 'Dog',
-    owner: 'Sarah Johnson',
-    registrationDate: '2024-01-15',
-    status: 'active',
-    location: 'Registered'
-  },
-  {
-    id: 2,
-    chipId: 'MC001234567891',
-    petName: 'Whiskers',
-    petType: 'Cat',
-    owner: 'Mike Chen',
-    registrationDate: '2024-01-20',
-    status: 'active',
-    location: 'Registered'
-  },
-  {
-    id: 3,
-    chipId: 'MC001234567892',
-    petName: 'Max',
-    petType: 'Dog',
-    owner: 'Emma Davis',
-    registrationDate: '2024-01-18',
-    status: 'pending',
-    location: 'Pending Verification'
-  },
-  {
-    id: 4,
-    chipId: 'MC001234567893',
-    petName: 'Luna',
-    petType: 'Cat',
-    owner: 'Alex Wilson',
-    registrationDate: '2024-01-22',
-    status: 'inactive',
-    location: 'Deactivated'
-  }
-];
+import { Search, MoreHorizontal, Edit, Zap, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { useMicrochipStats, useMicrochippedPets, useDeleteMicrochippedPet } from '@/hooks/useMicrochip';
+import { RegisterMicrochipModal } from '@/components/microchip/RegisterMicrochipModal';
+import { EditPetModal } from '@/components/microchip/EditPetModal';
+import { DeletePetDialog } from '@/components/microchip/DeletePetDialog';
+import { MicrochippedPet } from '@/services/microchip.service';
+import { MicrochipStatsSkeleton, MicrochipTableSkeleton } from '@/components/microchip/MicrochipSkeleton';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export function Microchips() {
   const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredMicrochips = mockMicrochips.filter(chip =>
-    chip.chipId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chip.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chip.owner.toLowerCase().includes(searchTerm.toLowerCase())
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; petId: string; petName: string }>({
+    isOpen: false,
+    petId: '',
+    petName: ''
+  });
+  
+  const { data: stats, isLoading: loadingStats } = useMicrochipStats();
+  const { data: microchippedPets = [], isLoading: loadingPets } = useMicrochippedPets();
+  const deleteMutation = useDeleteMicrochippedPet();
+  
+  const filteredPets = microchippedPets.filter((pet: MicrochippedPet) =>
+    pet.microchip_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pet.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pet.ownerName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return { backgroundColor: '#95CA3C', color: 'white' };
-      case 'pending':
-        return { backgroundColor: '#7A3FC2', color: 'white' };
-      case 'inactive':
-        return {};
-      default:
-        return {};
+  const handleDeletePet = async (petId: string, petName: string) => {
+    setDeleteDialog({ isOpen: true, petId, petName });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync(deleteDialog.petId);
+      setDeleteDialog({ isOpen: false, petId: '', petName: '' });
+    } catch (error) {
+      console.error('Erro ao deletar pet:', error);
+      alert('Erro ao deletar pet. Tente novamente.');
     }
+  };
+
+  const getGrowthIcon = (percentage: number) => {
+    if (percentage > 0) return <TrendingUp className="h-4 w-4 text-green-600" />;
+    if (percentage < 0) return <TrendingDown className="h-4 w-4 text-red-600" />;
+    return null;
+  };
+
+  const getGrowthColor = (percentage: number) => {
+    if (percentage > 0) return 'text-green-600';
+    if (percentage < 0) return 'text-red-600';
+    return 'text-gray-600';
   };
 
   return (
@@ -92,44 +79,63 @@ export function Microchips() {
           <h1 className="text-3xl font-bold">Microchip Management</h1>
           <p className="text-gray-600 mt-2">Track and manage pet microchip registrations</p>
         </div>
-        <Button style={{ backgroundColor: '#95CA3C' }} className="text-white hover:opacity-90">
-          <Plus className="mr-2 h-4 w-4" />
-          Register Microchip
-        </Button>
+        <RegisterMicrochipModal />
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4" style={{ color: '#95CA3C' }} />
-              <div>
-                <div className="text-2xl font-bold">1,247</div>
-                <p className="text-sm text-gray-600">Total Microchips</p>
+      {loadingStats ? (
+        <MicrochipStatsSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-4 w-4" style={{ color: '#95CA3C' }} />
+                <div>
+                  <div className="text-2xl font-bold">
+                    {stats?.totalPets || 0}
+                  </div>
+                  <p className="text-sm text-gray-600">Total de Pets</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">1,156</div>
-            <p className="text-sm text-gray-600">Active Registrations</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">67</div>
-            <p className="text-sm text-gray-600">Pending Verification</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-sm text-gray-600">This Month</p>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold">
+                {stats?.microchippedPets || 0}
+              </div>
+              <p className="text-sm text-gray-600">Pets Microchipados</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold">
+                {stats?.pendingMicrochips || 0}
+              </div>
+              <p className="text-sm text-gray-600">Pendentes</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold">
+                {stats?.thisMonthMicrochips || 0}
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">Este Mês</p>
+                {stats?.growthPercentage !== undefined && stats.growthPercentage !== 0 && (
+                  <div className={`flex items-center text-sm ${getGrowthColor(stats.growthPercentage)}`}>
+                    {getGrowthIcon(stats.growthPercentage)}
+                    <span className="ml-1">
+                      {stats.growthPercentage > 0 ? '+' : ''}{stats.growthPercentage.toFixed(1)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Search */}
       <Card>
@@ -137,7 +143,7 @@ export function Microchips() {
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search by chip ID, pet name, or owner..."
+              placeholder="Buscar por número do chip, nome do pet ou proprietário..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -147,70 +153,102 @@ export function Microchips() {
       </Card>
 
       {/* Microchips Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Microchip Registry ({filteredMicrochips.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Chip ID</TableHead>
-                <TableHead>Pet Name</TableHead>
-                <TableHead>Pet Type</TableHead>
-                <TableHead>Owner</TableHead>
-                <TableHead>Registration Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMicrochips.map((chip) => (
-                <TableRow key={chip.id}>
-                  <TableCell className="font-mono text-sm">{chip.chipId}</TableCell>
-                  <TableCell className="font-medium">{chip.petName}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{chip.petType}</Badge>
-                  </TableCell>
-                  <TableCell>{chip.owner}</TableCell>
-                  <TableCell className="text-gray-600">{chip.registrationDate}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={chip.status === 'active' ? 'default' : chip.status === 'pending' ? 'secondary' : 'destructive'}
-                      style={getStatusColor(chip.status)}
-                    >
-                      {chip.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit Registration
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Deactivate
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+      {loadingPets ? (
+        <MicrochipTableSkeleton />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Pets Microchipados ({filteredPets.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Número do Chip</TableHead>
+                  <TableHead>Pet</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Raça</TableHead>
+                  <TableHead>Pelagem</TableHead>
+                  <TableHead>Proprietário</TableHead>
+                  <TableHead>Data de Implantação</TableHead>
+                  <TableHead>Localização</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredPets.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="text-center py-8">
+                      Nenhum pet microchipado encontrado
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredPets.map((pet: MicrochippedPet) => (
+                    <TableRow key={pet.id_pet}>
+                      <TableCell className="font-mono text-sm">
+                        {pet.microchip_number}
+                      </TableCell>
+                      <TableCell className="font-medium">{pet.nome}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{pet.tipo}</Badge>
+                      </TableCell>
+                      <TableCell>{pet.raca || 'N/A'}</TableCell>
+                      <TableCell>{pet.pelagem || 'N/A'}</TableCell>
+                      <TableCell>{pet.ownerName || 'N/A'}</TableCell>
+                      <TableCell className="text-gray-600">
+                        {pet.microchip_implantation_date
+                          ? format(new Date(pet.microchip_implantation_date), 'dd/MM/yyyy', { locale: ptBR })
+                          : 'Não informado'
+                        }
+                      </TableCell>
+                      <TableCell>
+                        {pet.microchip_location || 'Não informado'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <EditPetModal 
+                              pet={pet}
+                              trigger={
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Editar
+                                </DropdownMenuItem>
+                              }
+                            />
+                            <DropdownMenuItem 
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => handleDeletePet(pet.id_pet, pet.nome)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              {deleteMutation.isPending ? 'Deletando...' : 'Deletar'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeletePetDialog
+        petName={deleteDialog.petName}
+        isOpen={deleteDialog.isOpen}
+        onOpenChange={(open) => setDeleteDialog(prev => ({ ...prev, isOpen: open }))}
+        onConfirm={handleConfirmDelete}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }
