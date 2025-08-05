@@ -8,7 +8,6 @@ export interface BannerFormData extends Omit<Banner, 'imagem_url'> {
 
 export const getBanners = async (): Promise<BannerResponse[]> => {
   const response = await api.get<BannerResponse[]>(BANNERS_ROUTE());
-  console.log('getBanners', response.data);
   return response.data;
 };
 

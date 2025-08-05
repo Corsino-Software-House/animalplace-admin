@@ -382,7 +382,7 @@ export function Banners() {
                             <img 
                               src={banner.imagem_url} 
                               alt={banner.titulo}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                                 const fallback = e.currentTarget.nextElementSibling as HTMLElement;
