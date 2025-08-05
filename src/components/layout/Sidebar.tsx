@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { LayoutDashboard, Users, Image, CreditCard, Package, Settings, Calendar, Zap, Gift, BarChart3, PawPrint as Paw, LogOut, Menu, X } from 'lucide-react';
 import { useAuth, useLogout } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -15,7 +15,7 @@ const navigation = [
   { name: 'Agenda', href: '/agenda', icon: Calendar },
   { name: 'Microchips', href: '/microchips', icon: Zap },
   { name: 'Cashbacks', href: '/cashbacks', icon: Gift },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
+  // { name: 'Reports', href: '/reports', icon: BarChart3 },
 ];
 
 interface SidebarProps {

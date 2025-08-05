@@ -13,7 +13,7 @@ import { Services } from '@/pages/Services';
 import { Agenda } from '@/pages/Agenda';
 import { Microchips } from '@/pages/Microchips';
 import { Cashbacks } from '@/pages/Cashbacks';
-import { Reports } from '@/pages/Reports';
+// import { Reports } from '@/pages/Reports';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
@@ -139,7 +139,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/reports"
               element={
                 <ProtectedRoute>
@@ -148,7 +148,7 @@ function App() {
                   </Layout>
                 </ProtectedRoute>
               }
-            />
+            /> */}
           </Routes>
           <Toaster />
           <SonnerToaster position="top-right" />
