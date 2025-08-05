@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -11,10 +11,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Upload, Image, Trash2 } from 'lucide-react';
 import { ReportType } from '@/types/reports';
-import { reportsService } from '@/services/reports-service';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useReportUpload } from '@/hooks/useReportUpload';
+import { UploadProgressComponent } from './UploadProgressComponent';
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -27,17 +27,10 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
   const [type, setType] = useState<ReportType>(ReportType.SUPPORT);
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const queryClient = useQueryClient();
-
-  const createReportMutation = useMutation({
-    mutationFn: reportsService.createReport,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reports'] });
-      queryClient.invalidateQueries({ queryKey: ['report-statistics'] });
-      handleClose();
-    },
-  });
+  const { uploadReport, isUploading, uploadProgress, resetProgress } = useReportUpload();
 
   const handleClose = () => {
     setTitle('');
@@ -45,23 +38,73 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
     setType(ReportType.SUPPORT);
     setContactEmail('');
     setContactPhone('');
+    setSelectedFiles([]);
+    resetProgress();
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    
+    // Validate file types
+    const validFiles = files.filter(file => {
+      const isValidType = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'].includes(file.type);
+      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+      return isValidType && isValidSize;
+    });
+
+    if (validFiles.length !== files.length) {
+      alert('Alguns arquivos foram removidos por não atenderem aos critérios (apenas JPG, PNG, GIF, PDF até 10MB)');
+    }
+
+    setSelectedFiles(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim() || !description.trim()) {
       return;
     }
 
-    createReportMutation.mutate({
-      title: title.trim(),
-      description: description.trim(),
-      type,
-      contactEmail: contactEmail.trim() || undefined,
-      contactPhone: contactPhone.trim() || undefined,
+    const formData = new FormData();
+    formData.append('title', title.trim());
+    formData.append('description', description.trim());
+    formData.append('type', type);
+    
+    if (contactEmail.trim()) {
+      formData.append('contactEmail', contactEmail.trim());
+    }
+    
+    if (contactPhone.trim()) {
+      formData.append('contactPhone', contactPhone.trim());
+    }
+
+    // Add files
+    selectedFiles.forEach((file) => {
+      formData.append('attachments', file);
     });
+
+    try {
+      await uploadReport(formData);
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
+    } catch (error) {
+      console.error('Error creating report:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -76,6 +119,12 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
           </Button>
         </CardHeader>
         <CardContent>
+          {uploadProgress && (
+            <div className="mb-4">
+              <UploadProgressComponent progress={uploadProgress} />
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="type">Tipo de Relatório</Label>
@@ -102,6 +151,7 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Descreva brevemente o problema ou sugestão"
                 required
+                disabled={isUploading}
               />
             </div>
 
@@ -114,6 +164,7 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
                 placeholder="Forneça detalhes sobre o problema, sugestão ou solicitação"
                 rows={4}
                 required
+                disabled={isUploading}
               />
             </div>
 
@@ -126,6 +177,7 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="seu@email.com"
+                  disabled={isUploading}
                 />
               </div>
 
@@ -136,24 +188,89 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="+55 11 99999-9999"
+                  disabled={isUploading}
                 />
               </div>
             </div>
 
+            {/* File Upload Section */}
+            <div>
+              <Label>Anexos (até 5 imagens/PDFs)</Label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading || selectedFiles.length >= 5}
+                    className="w-full sm:w-auto"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Adicionar Arquivos
+                  </Button>
+                  <span className="text-sm text-gray-500">
+                    {selectedFiles.length}/5 arquivos
+                  </span>
+                </div>
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                {/* Selected Files List */}
+                {selectedFiles.length > 0 && (
+                  <div className="space-y-2 border rounded-lg p-3">
+                    <h4 className="text-sm font-medium">Arquivos Selecionados:</h4>
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <div className="flex items-center space-x-2">
+                          <Image className="h-4 w-4 text-gray-400" />
+                          <div>
+                            <p className="text-sm font-medium">{file.name}</p>
+                            <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFile(index)}
+                          disabled={isUploading}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleClose} 
+                className="w-full sm:w-auto"
+                disabled={isUploading}
+              >
                 Cancelar
               </Button>
               <Button 
                 type="submit" 
                 style={{ backgroundColor: '#95CA3C' }}
                 className="text-white hover:opacity-90 w-full sm:w-auto"
-                disabled={createReportMutation.isPending || !title.trim() || !description.trim()}
+                disabled={isUploading || !title.trim() || !description.trim()}
               >
-                {createReportMutation.isPending ? (
+                {isUploading ? (
                   <>
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Criando...
+                    Enviando...
                   </>
                 ) : (
                   <>
