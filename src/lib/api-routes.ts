@@ -11,6 +11,7 @@ export const REPORTS_ROUTE = () => '/api/reports';
 export const REPORTS_STATISTICS_ROUTE = () => '/api/reports/statistics';
 export const REPORTS_MY_ROUTE = () => '/api/reports/my-reports';
 export const LOGIN_ROUTE = () => '/api/auth/login';
+export const REFRESH_TOKEN_ROUTE = () => '/api/auth/refresh';
 
 export const REGISTER_ROUTE = () => '/api/auth/register';
 export const VERIFY_EMAIL_CODE_ROUTE = () => '/api/auth/verify-email-code';

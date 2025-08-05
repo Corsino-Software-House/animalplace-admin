@@ -10,6 +10,7 @@ export interface LoginResponse {
   message: string;
   data: {
     token: string;
+    refreshToken: string;
     user: User;
   };
 }
@@ -30,6 +31,20 @@ export interface RegisterResponse {
   message: string;
   data: {
     email: string;
+  };
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+  userId: string;
+}
+
+export interface RefreshTokenResponse {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    refreshToken: string;
   };
 }
 
