@@ -94,7 +94,7 @@ export function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
+          <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
         </div>
         {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -116,7 +116,7 @@ export function Dashboard() {
           {/* Recent Activity Skeleton */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Atividades Recentes</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -136,9 +136,9 @@ export function Dashboard() {
             </CardContent>
           </Card>
           {/* Quick Actions Skeleton */}
-          <Card>
+          {/* <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Ações Rápidas</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -147,7 +147,7 @@ export function Dashboard() {
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     );
@@ -158,7 +158,7 @@ export function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
+          <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
         </div>
         <div className="flex flex-col items-center justify-center py-16">
           <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md w-full text-center">
@@ -168,7 +168,7 @@ export function Dashboard() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-red-800 mb-2">
-              Erro ao carregar dashboard
+              Erro ao carregar o dashboard
             </h3>
             <p className="text-red-600 mb-4">
               Não foi possível carregar os dados do dashboard. Verifique sua conexão e tente novamente.
@@ -190,34 +190,34 @@ export function Dashboard() {
       {/* Header */}
       <div className="text-center lg:text-left">
         <h1 className="text-2xl lg:text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo com o AnimalPlace.</p>
+        <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatsCard
-          title="Total Users"
+          title="Total de Usuários"
           value={dashboardData?.totalUsers.value || 0}
           change={dashboardData?.totalUsers.growth}
           changeType={dashboardData?.totalUsers.growth ? getChangeType(dashboardData.totalUsers.growth) : 'neutral'}
           icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
-          title="Monthly Revenue"
+          title="Receita Mensal"
           value={dashboardData?.monthlyRevenue.value ? formatCurrency(dashboardData.monthlyRevenue.value) : 'R$ 0,00'}
           change={dashboardData?.monthlyRevenue.growth}
           changeType={dashboardData?.monthlyRevenue.growth ? getChangeType(dashboardData.monthlyRevenue.growth) : 'neutral'}
           icon={<CreditCard className="h-4 w-4" />}
         />
         <StatsCard
-          title="Active Plans"
+          title="Planos Ativos"
           value={dashboardData?.activePlans.value || 0}
           change={dashboardData?.activePlans.growth}
           changeType={dashboardData?.activePlans.growth ? getChangeType(dashboardData.activePlans.growth) : 'neutral'}
           icon={<Package className="h-4 w-4" />}
         />
         <StatsCard
-          title="Appointments Today"
+          title="Agendamentos Hoje"
           value={dashboardData?.appointmentsToday.value || 0}
           change={dashboardData?.appointmentsToday.growth}
           changeType={dashboardData?.appointmentsToday.growth ? getChangeType(dashboardData.appointmentsToday.growth) : 'neutral'}
