@@ -28,9 +28,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, MoreHorizontal, Eye, Edit, Trash2, Image as ImageIcon, Loader2, Calendar, Link2, BarChart3 } from 'lucide-react';
-import { getBanners, createBanner, updateBanner, deleteBanner } from '@/services/banners-service';
-import { Banner, BannerResponse } from '@/types/banners';
+import { Plus, MoreHorizontal, Eye, Edit, Trash2, Image as ImageIcon, Loader2, Calendar, Link2, BarChart3, X } from 'lucide-react';
+import { getBanners, createBanner, updateBanner, deleteBanner, BannerFormData } from '@/services/banners-service';
+import { BannerResponse } from '@/types/banners';
 import { colors } from '@/theme/colors';
 
 export function Banners() {
@@ -38,15 +38,17 @@ export function Banners() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedBanner, setSelectedBanner] = useState<BannerResponse | null>(null);
-  const [formData, setFormData] = useState<Banner>({
+  const [formData, setFormData] = useState<BannerFormData>({
     titulo: '',
     descricao: '',
-    imagem_url: '',
     link_url: '',
     data_inicio: '',
     data_fim: '',
     ativo: true
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [existingImageUrl, setExistingImageUrl] = useState<string>('');
 
   const queryClient = useQueryClient();
 
@@ -65,7 +67,7 @@ export function Banners() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, banner }: { id: string; banner: Banner }) => 
+    mutationFn: ({ id, banner }: { id: string; banner: BannerFormData }) => 
       updateBanner(id, banner),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banners'] });
@@ -87,22 +89,60 @@ export function Banners() {
     setFormData({
       titulo: '',
       descricao: '',
-      imagem_url: '',
       link_url: '',
       data_inicio: '',
       data_fim: '',
       ativo: true
     });
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setExistingImageUrl('');
     setSelectedBanner(null);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setFormData({ ...formData, image: file });
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setExistingImageUrl('');
+    setFormData({ ...formData, image: undefined });
+    
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleCreate = () => {
-    createMutation.mutate(formData);
+    const submitData = { ...formData };
+    if (selectedFile) {
+      submitData.image = selectedFile;
+    }
+    createMutation.mutate(submitData);
   };
 
   const handleEdit = () => {
     if (selectedBanner) {
-      updateMutation.mutate({ id: selectedBanner.id, banner: formData });
+      const submitData = { ...formData };
+      if (selectedFile) {
+        submitData.image = selectedFile;
+      }
+      updateMutation.mutate({ id: selectedBanner.id, banner: submitData });
     }
   };
 
@@ -117,12 +157,14 @@ export function Banners() {
     setFormData({
       titulo: banner.titulo,
       descricao: banner.descricao,
-      imagem_url: banner.imagem_url,
       link_url: banner.link_url,
       data_inicio: banner.data_inicio.split('T')[0],
       data_fim: banner.data_fim.split('T')[0],
       ativo: banner.ativo
     });
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setExistingImageUrl(banner.imagem_url);
     setIsEditOpen(true);
   };
 
@@ -222,12 +264,33 @@ export function Banners() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium" style={{ color: colors.gray_light }}>URL da Imagem</label>
-                  <Input
-                    value={formData.imagem_url}
-                    onChange={(e) => setFormData({ ...formData, imagem_url: e.target.value })}
-                    placeholder="https://exemplo.com/imagem.jpg"
-                  />
+                  <label className="text-sm font-medium" style={{ color: colors.gray_light }}>Imagem do Banner</label>
+                  <div className="space-y-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="cursor-pointer"
+                    />
+                    {previewUrl && (
+                      <div className="relative mt-2">
+                        <img 
+                          src={previewUrl} 
+                          alt="Preview" 
+                          className="max-w-xs max-h-32 object-cover rounded border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 left-1 h-6 w-6 p-0"
+                          onClick={removeImage}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium" style={{ color: colors.gray_light }}>URL de Destino</label>
@@ -424,12 +487,38 @@ export function Banners() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium" style={{ color: colors.gray_light }}>URL da Imagem</label>
-                <Input
-                  value={formData.imagem_url}
-                  onChange={(e) => setFormData({ ...formData, imagem_url: e.target.value })}
-                  placeholder="https://exemplo.com/imagem.jpg"
-                />
+                <label className="text-sm font-medium" style={{ color: colors.gray_light }}>Imagem do Banner</label>
+                <div className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="cursor-pointer"
+                  />
+                  {(previewUrl || existingImageUrl) && (
+                    <div className="relative mt-2">
+                      <img 
+                        src={previewUrl || existingImageUrl} 
+                        alt="Preview" 
+                        className="max-w-xs max-h-32 object-cover rounded border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0"
+                        onClick={removeImage}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                  {!previewUrl && !existingImageUrl && (
+                    <div className="text-xs" style={{ color: colors.gray_light }}>
+                      Selecione uma nova imagem para substituir a atual
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium" style={{ color: colors.gray_light }}>URL de Destino</label>

@@ -8,6 +8,10 @@ export interface Banner {
   ativo: boolean;
 }
 
+export interface BannerFormData extends Omit<Banner, 'imagem_url'> {
+  image?: File;
+}
+
 export interface BannerResponse {
   id: string;
   titulo: string;
