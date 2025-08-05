@@ -76,8 +76,8 @@ export function Microchips() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Microchip Management</h1>
-          <p className="text-gray-600 mt-2">Track and manage pet microchip registrations</p>
+          <h1 className="text-3xl font-bold">Gestão de Microchips</h1>
+          <p className="text-gray-600 mt-2">Acompanhe e gerencie registros de microchips de pets</p>
         </div>
         <RegisterMicrochipModal />
       </div>

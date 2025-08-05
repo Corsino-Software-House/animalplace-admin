@@ -4,18 +4,17 @@ import { LayoutDashboard, Users, Image, CreditCard, Package, Settings, Calendar,
 import { useAuth, useLogout } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 // import { useState, useEffect } from 'react';
-
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Users', href: '/users', icon: Users },
+  { name: 'Painel', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Usuários', href: '/users', icon: Users },
   { name: 'Banners', href: '/banners', icon: Image },
-  { name: 'Payments', href: '/payments', icon: CreditCard },
-  { name: 'Plans', href: '/plans', icon: Package },
-  { name: 'Services', href: '/services', icon: Settings },
+  { name: 'Pagamentos', href: '/payments', icon: CreditCard },
+  { name: 'Planos', href: '/plans', icon: Package },
+  { name: 'Serviços', href: '/services', icon: Settings },
   { name: 'Agenda', href: '/agenda', icon: Calendar },
   { name: 'Microchips', href: '/microchips', icon: Zap },
   { name: 'Cashbacks', href: '/cashbacks', icon: Gift },
-  // { name: 'Reports', href: '/reports', icon: BarChart3 },
+  // { name: 'Relatórios', href: '/reports', icon: BarChart3 },
 ];
 
 interface SidebarProps {
