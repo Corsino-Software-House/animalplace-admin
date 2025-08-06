@@ -56,7 +56,8 @@ export interface VerifyEmailCodeData {
 export interface VerifyEmailCodeResponse {
   message: string;
   user: User;
-  token: string;
+  token?: string;
+  refreshToken?: string;
 }
 
 export interface ResendVerificationData {

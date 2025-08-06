@@ -24,7 +24,12 @@ export default function Login() {
 
     try {
       await loginMutation.mutateAsync(loginData);
-      navigate('/dashboard');
+      
+      // Aguardar um momento para garantir que a autenticação foi processada
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
+      
     } catch {
       // Erro já tratado no hook
     } finally {

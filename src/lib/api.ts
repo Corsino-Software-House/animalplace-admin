@@ -8,7 +8,15 @@ export const api = axios.create({
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
   },
-  withCredentials: true, // Importante para enviar cookies automaticamente
+});
+
+// Interceptor para adicionar token do localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('animalplace_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Flag para evitar múltiplas tentativas de refresh simultâneas
@@ -33,19 +41,19 @@ const processQueue = (error: any, success: boolean = false) => {
 // Função para tentar renovar o token
 const refreshToken = async (): Promise<boolean> => {
   try {
-    // Como os tokens estão em cookies HTTP-Only, não precisamos buscá-los do localStorage
-    // O refresh será feito apenas com os cookies que o navegador envia automaticamente
+    const refreshTokenValue = localStorage.getItem('animalplace_refresh_token');
     const userString = localStorage.getItem('animalplace_user');
-    if (!userString) {
-      throw new Error('Usuário não encontrado');
+    
+    if (!refreshTokenValue || !userString) {
+      throw new Error('Dados de autenticação não encontrados');
     }
     
     const user = JSON.parse(userString);
     
     const response = await axios.post<RefreshTokenResponse>(
-      `${env.BASE_URL_API}/auth/refresh-token`,
+      `${env.BASE_URL_API}/api/auth/refresh-token`,
       {
-        refreshToken: '', // Será lido do cookie pelo backend
+        refreshToken: refreshTokenValue,
         userId: user.id,
       } as RefreshTokenRequest,
       {
@@ -53,13 +61,13 @@ const refreshToken = async (): Promise<boolean> => {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true',
         },
-        withCredentials: true, // Importante para enviar cookies
       }
     );
 
     if (response.data.success) {
-      // Com cookies HTTP-Only, não precisamos armazenar tokens no localStorage
-      // Os novos tokens já foram definidos como cookies pelo backend
+      // Salvar novos tokens no localStorage
+      localStorage.setItem('animalplace_token', response.data.data.token);
+      localStorage.setItem('animalplace_refresh_token', response.data.data.refreshToken);
       return true;
     }
     
@@ -69,18 +77,14 @@ const refreshToken = async (): Promise<boolean> => {
     
     // Limpar dados de autenticação
     localStorage.removeItem('animalplace_user');
+    localStorage.removeItem('animalplace_token');
+    localStorage.removeItem('animalplace_refresh_token');
     
     return false;
   }
 };
 
-// Interceptor para adicionar credenciais nas requisições
-api.interceptors.request.use((config) => {
-  // Com cookies HTTP-Only, não precisamos adicionar token manualmente
-  // Mas precisamos garantir que os cookies sejam enviados
-  config.withCredentials = true;
-  return config;
-});
+// Removido interceptor para credenciais - não mais necessário com localStorage
 
 // Interceptor para lidar com tokens inválidos
 api.interceptors.response.use(
