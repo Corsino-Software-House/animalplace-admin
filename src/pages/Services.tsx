@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, Edit, Trash2, AlertCircle, Search, X, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, AlertCircle, Search, X, Loader2, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useServices } from '@/hooks/useServices';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -26,6 +26,7 @@ import { EditServiceModal } from '@/components/services/EditServiceModal';
 import { DeleteServiceDialog } from '@/components/services/DeleteServiceDialog';
 import { ServiceDetailsModal } from '@/components/services/ServiceDetailsModal';
 import { ServiceType, ServiceCategory } from '@/types/services';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Função para traduzir categorias
 const getCategoryLabel = (category: ServiceCategory) => {
@@ -76,6 +77,9 @@ const formatDuration = (duration: number) => {
 export function Services() {
   const { data: services, isLoading, error } = useServices();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | 'all'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Debounce do termo de pesquisa (300ms de delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -83,23 +87,64 @@ export function Services() {
   // Indicador se está filtrando (para mostrar loading durante debounce)
   const isFiltering = searchTerm !== debouncedSearchTerm;
 
-  // Filtrar serviços baseado no termo de pesquisa com debounce
+  // Filtrar serviços baseado no termo de pesquisa e categoria
   const filteredServices = useMemo(() => {
-    if (!services || !debouncedSearchTerm.trim()) return services;
+    if (!services) return [];
 
-    const term = debouncedSearchTerm.toLowerCase().trim();
-    return services.filter(service => 
-      service.name.toLowerCase().includes(term) ||
-      service.description.toLowerCase().includes(term) ||
-      getTypeLabel(service.type).toLowerCase().includes(term) ||
-      getCategoryLabel(service.category).toLowerCase().includes(term)
-    );
-  }, [services, debouncedSearchTerm]);
+    let filtered = services;
+
+    // Filtrar por categoria
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(service => service.category === selectedCategory);
+    }
+
+    // Filtrar por termo de pesquisa
+    if (debouncedSearchTerm.trim()) {
+      const term = debouncedSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(service => 
+        service.name.toLowerCase().includes(term) ||
+        service.description.toLowerCase().includes(term) ||
+        getTypeLabel(service.type).toLowerCase().includes(term) ||
+        getCategoryLabel(service.category).toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
+  }, [services, debouncedSearchTerm, selectedCategory]);
+
+  // Calcular paginação
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+  const paginatedServices = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredServices.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredServices, currentPage, itemsPerPage]);
+
+  // Reset página quando filtros mudarem
+  const resetPage = () => setCurrentPage(1);
 
   // Calcular estatísticas - usar serviços filtrados
-  const totalServices = filteredServices?.length || 0;
-  const activeServices = filteredServices?.filter(service => service.isActive).length || 0;
+  const totalServices = filteredServices.length;
+  const activeServices = filteredServices.filter(service => service.isActive).length;
   const categories = filteredServices ? new Set(filteredServices.map(service => service.category)).size : 0;
+
+  // Obter lista de categorias disponíveis
+  const availableCategories = useMemo(() => {
+    if (!services) return [];
+    const categoriesSet = new Set(services.map(service => service.category));
+    return Array.from(categoriesSet).sort();
+  }, [services]);
+
+  // Handler para mudança de categoria
+  const handleCategoryChange = (category: ServiceCategory | 'all') => {
+    setSelectedCategory(category);
+    resetPage();
+  };
+
+  // Handler para mudança de pesquisa
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    resetPage();
+  };
 
   if (error) {
     return (
@@ -136,7 +181,7 @@ export function Services() {
             <Input
               placeholder="Pesquisar serviços..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10 pr-10"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
@@ -145,7 +190,7 @@ export function Services() {
               )}
               {searchTerm && (
                 <button
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => handleSearchChange('')}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="h-4 w-4" />
@@ -153,7 +198,26 @@ export function Services() {
               )}
             </div>
           </div>
-          {debouncedSearchTerm && (
+          
+          {/* Category Filter */}
+          <div className="flex items-center gap-2 min-w-[200px]">
+            <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filtrar por categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as Categorias</SelectItem>
+                {availableCategories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {getCategoryLabel(category)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {(debouncedSearchTerm || selectedCategory !== 'all') && (
             <div className="text-sm text-gray-600">
               {totalServices === 1 
                 ? `1 serviço encontrado` 
@@ -222,13 +286,17 @@ export function Services() {
                 </div>
               ))}
             </div>
-          ) : filteredServices?.length === 0 ? (
+          ) : filteredServices.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-500">
-                {debouncedSearchTerm ? (
+                {debouncedSearchTerm || selectedCategory !== 'all' ? (
                   <>
                     <p className="text-lg font-medium mb-2">Nenhum serviço encontrado</p>
-                    <p className="text-sm">Nenhum serviço corresponde à sua pesquisa "{debouncedSearchTerm}".</p>
+                    <p className="text-sm">
+                      Nenhum serviço corresponde aos filtros aplicados.
+                      {debouncedSearchTerm && ` Pesquisa: "${debouncedSearchTerm}"`}
+                      {selectedCategory !== 'all' && ` Categoria: ${getCategoryLabel(selectedCategory)}`}
+                    </p>
                   </>
                 ) : (
                   <>
@@ -242,7 +310,7 @@ export function Services() {
             <>
               {/* Mobile Cards View */}
               <div className="block md:hidden space-y-4">
-                {filteredServices?.map((service) => (
+                {paginatedServices.map((service) => (
                   <ServiceDetailsModal
                     key={service.id}
                     serviceId={service.id}
@@ -364,7 +432,7 @@ export function Services() {
               </TableRow>
             </TableHeader>
             <TableBody>
-                    {filteredServices?.map((service) => (
+                    {paginatedServices.map((service) => (
                       <TableRow key={service.id} className="hover:bg-gray-50">
                                                 <ServiceDetailsModal
                           serviceId={service.id}
@@ -474,6 +542,66 @@ export function Services() {
                 </div>
               </div>
             </>
+          )}
+          
+          {/* Pagination Controls */}
+          {filteredServices.length > 0 && totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+              <div className="text-sm text-gray-600 order-2 sm:order-1">
+                Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, totalServices)} de {totalServices} serviços
+              </div>
+              
+              <div className="flex items-center gap-2 order-1 sm:order-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline">Anterior</span>
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNumber;
+                    if (totalPages <= 5) {
+                      pageNumber = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNumber = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNumber = totalPages - 4 + i;
+                    } else {
+                      pageNumber = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNumber}
+                        variant={currentPage === pageNumber ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNumber)}
+                        className="w-8 h-8 p-0 text-sm"
+                      >
+                        {pageNumber}
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1"
+                >
+                  <span className="hidden sm:inline">Próxima</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
