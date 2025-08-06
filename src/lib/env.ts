@@ -20,10 +20,7 @@ const envSchema = z.object({
 // Validação das variáveis de ambiente
 const validateEnv = () => {
   const envVars = {
-    BASE_URL_API: import.meta.env.VITE_BASE_URL_API || 
-                  process.env.VITE_BASE_URL_API || 
-                  process.env.BASE_URL_API ||
-                  'https://b94d9ce85a43.ngrok-free.app', // Fallback para desenvolvimento
+    BASE_URL_API: import.meta.env.VITE_BASE_URL_API || process.env.VITE_BASE_URL_API || process.env.BASE_URL_API,
     NODE_ENV: import.meta.env.MODE || process.env.NODE_ENV || 'development',
   };
 
@@ -41,7 +38,7 @@ const validateEnv = () => {
       if (envVars.NODE_ENV === 'development') {
         console.warn('\nUsando valores padrão para desenvolvimento...');
         return {
-          BASE_URL_API: 'https://b94d9ce85a43.ngrok-free.app',
+          BASE_URL_API: process.env.VITE_BASE_URL_API,
           NODE_ENV: 'development' as const,
         };
       }
