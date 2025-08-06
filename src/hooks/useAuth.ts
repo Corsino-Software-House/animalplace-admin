@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { LOGIN_ROUTE, REGISTER_ROUTE, VERIFY_EMAIL_CODE_ROUTE, RESEND_VERIFICATION_ROUTE } from '@/lib/api-routes';
 import { 
@@ -21,13 +21,6 @@ interface ApiError {
   };
 }
 
-// Interface para o check de autenticação
-interface AuthCheckResponse {
-  success: boolean;
-  authenticated: boolean;
-  message: string;
-}
-
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
@@ -37,11 +30,13 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Salva apenas o usuário para exibição
+      localStorage.setItem('animalplace_token', data.data.token);
       localStorage.setItem('animalplace_user', JSON.stringify(data.data.user));
+      
       toast.success(data.message);
+      
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['auth-check'] });
+      
     },
     onError: (error: ApiError) => {
       console.error('Erro no login:', error);
@@ -87,7 +82,9 @@ export const useVerifyEmailCode = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      localStorage.setItem('animalplace_token', data.token);
       localStorage.setItem('animalplace_user', JSON.stringify(data.user));
+      
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
@@ -120,68 +117,59 @@ export const useLogout = () => {
   return () => {
     clearAuth();
     queryClient.clear();
-    // Fazer logout no backend para limpar cookies
-    api.post('/auth/logout').catch(() => {
-      // Se falhar, não há problema, só limpar dados localmente
-    });
     window.location.href = '/login';
   };
 };
 
 // Função para limpar dados de autenticação
 export const clearAuth = () => {
+  localStorage.removeItem('animalplace_token');
   localStorage.removeItem('animalplace_user');
-  // Nota: os tokens ficam em cookies HTTP-Only e são limpos pelo backend
-};
-
-// Hook para verificar autenticação baseado em cookies
-export const useAuthCheck = () => {
-  return useQuery({
-    queryKey: ['auth-check'],
-    queryFn: async (): Promise<AuthCheckResponse> => {
-      try {
-        const response = await api.get('api/auth/check');
-        return response.data;
-      } catch (error) {
-        return {
-          success: false,
-          authenticated: false,
-          message: 'Não autenticado',
-        };
-      }
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-  });
 };
 
 // Função para verificar se o token está válido (formato básico)
+const isTokenValid = (token: string | null): boolean => {
+  if (!token) return false;
+  
+  try {
+    // Verificar se o token tem o formato JWT básico (3 partes separadas por ponto)
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    
+    // Decodificar o payload para verificar expiração
+    const payload = JSON.parse(atob(parts[1]));
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Se tem campo de expiração, verificar se não expirou
+    if (payload.exp && payload.exp < now) {
+      clearAuth();
+      return false;
+    }
+    
+    return true;
+  } catch {
+    // Se não conseguir decodificar, considerar inválido
+    clearAuth();
+    return false;
+  }
+};
+
 export const useAuth = () => {
+  const token = localStorage.getItem('animalplace_token');
   const userString = localStorage.getItem('animalplace_user');
   const user = userString ? JSON.parse(userString) : null;
-  const { data: authCheck, isLoading } = useAuthCheck();
 
-  // Se estiver carregando, considera autenticado temporariamente para evitar flicker
-  if (isLoading && user) {
-    return {
-      isAuthenticated: true,
-      user,
-      isLoading: true,
-    };
-  }
-
-  // Verifica se tem usuário e se a verificação de autenticação é válida
-  const isAuthenticated = !!(user && authCheck?.authenticated);
-
-  // Se o usuário estava "logado" mas o check falhou, limpar dados
-  if (user && authCheck?.authenticated === false) {
+  // Verificar se o token é válido
+  const isValidToken = isTokenValid(token);
+  
+  // Se o token não for válido, limpar dados
+  if (token && !isValidToken) {
     clearAuth();
   }
 
   return {
-    isAuthenticated,
-    user: isAuthenticated ? user : null,
-    isLoading: false,
+    isAuthenticated: !!token && isValidToken,
+    user: isValidToken ? user : null,
+    token: isValidToken ? token : null,
   };
 };
