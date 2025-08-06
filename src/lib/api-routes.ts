@@ -62,4 +62,8 @@ export const ONE_SERVICE_ROUTE = (id: string) => `/api/services/${id}`;
 
 export const SERVICES_USAGE_RECORD_ROUTE = () => '/api/services-usage/record';
 
-export const SCHEDULE_SERVICE_ROUTE = () => '/api/schedule/service';
+export const GET_SCHEDULE_SERVICE_ROUTE = () => '/api/scheduling/without-token';
+
+export const RESCHEDULE_SERVICE_ROUTE = (id: string) => `/api/scheduling/${id}/reagendamento-admin`;
+
+export const DELETE_SCHEDULE_SERVICE_ROUTE = (id: string) => `/api/scheduling/${id}/cancelamento-admin`;
