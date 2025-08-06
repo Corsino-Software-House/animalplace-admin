@@ -22,11 +22,11 @@ api.interceptors.request.use((config) => {
 // Flag para evitar múltiplas tentativas de refresh simultâneas
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value: any) => void;
-  reject: (error: any) => void;
+  resolve: (value: unknown) => void;
+  reject: (error: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, success: boolean = false) => {
+const processQueue = (error: unknown, success: boolean = false) => {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
