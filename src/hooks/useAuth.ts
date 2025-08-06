@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { LOGIN_ROUTE, REGISTER_ROUTE, VERIFY_EMAIL_CODE_ROUTE, RESEND_VERIFICATION_ROUTE } from '@/lib/api-routes';
 import { 
@@ -21,6 +21,13 @@ interface ApiError {
   };
 }
 
+// Interface para o check de autenticação
+interface AuthCheckResponse {
+  success: boolean;
+  authenticated: boolean;
+  message: string;
+}
+
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
@@ -34,6 +41,7 @@ export const useLogin = () => {
       localStorage.setItem('animalplace_user', JSON.stringify(data.data.user));
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth-check'] });
     },
     onError: (error: ApiError) => {
       console.error('Erro no login:', error);
@@ -126,15 +134,54 @@ export const clearAuth = () => {
   // Nota: os tokens ficam em cookies HTTP-Only e são limpos pelo backend
 };
 
-// Função para verificar se o token está válido (formato básico)
+// Hook para verificar autenticação baseado em cookies
+export const useAuthCheck = () => {
+  return useQuery({
+    queryKey: ['auth-check'],
+    queryFn: async (): Promise<AuthCheckResponse> => {
+      try {
+        const response = await api.get('api/auth/check');
+        return response.data;
+      } catch (error) {
+        return {
+          success: false,
+          authenticated: false,
+          message: 'Não autenticado',
+        };
+      }
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+  });
+};
 
+// Função para verificar se o token está válido (formato básico)
 export const useAuth = () => {
   const userString = localStorage.getItem('animalplace_user');
   const user = userString ? JSON.parse(userString) : null;
+  const { data: authCheck, isLoading } = useAuthCheck();
 
-  // Considera autenticado se houver usuário salvo
+  // Se estiver carregando, considera autenticado temporariamente para evitar flicker
+  if (isLoading && user) {
+    return {
+      isAuthenticated: true,
+      user,
+      isLoading: true,
+    };
+  }
+
+  // Verifica se tem usuário e se a verificação de autenticação é válida
+  const isAuthenticated = !!(user && authCheck?.authenticated);
+
+  // Se o usuário estava "logado" mas o check falhou, limpar dados
+  if (user && authCheck?.authenticated === false) {
+    clearAuth();
+  }
+
   return {
-    isAuthenticated: !!user,
-    user,
+    isAuthenticated,
+    user: isAuthenticated ? user : null,
+    isLoading: false,
   };
 };
