@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Search, MoreHorizontal, Edit, Zap, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Search, MoreHorizontal, Edit, Zap, Trash2 } from 'lucide-react';
 import { useMicrochipStats, useMicrochippedPets, useDeleteMicrochippedPet } from '@/hooks/useMicrochip';
 import { RegisterMicrochipModal } from '@/components/microchip/RegisterMicrochipModal';
 import { EditPetModal } from '@/components/microchip/EditPetModal';
@@ -59,18 +59,6 @@ export function Microchips() {
     }
   };
 
-  const getGrowthIcon = (percentage: number) => {
-    if (percentage > 0) return <TrendingUp className="h-4 w-4 text-green-600" />;
-    if (percentage < 0) return <TrendingDown className="h-4 w-4 text-red-600" />;
-    return null;
-  };
-
-  const getGrowthColor = (percentage: number) => {
-    if (percentage > 0) return 'text-green-600';
-    if (percentage < 0) return 'text-red-600';
-    return 'text-gray-600';
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -86,7 +74,7 @@ export function Microchips() {
       {loadingStats ? (
         <MicrochipStatsSkeleton />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
@@ -106,32 +94,6 @@ export function Microchips() {
                 {stats?.microchippedPets || 0}
               </div>
               <p className="text-sm text-gray-600">Pets Microchipados</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">
-                {stats?.pendingMicrochips || 0}
-              </div>
-              <p className="text-sm text-gray-600">Pendentes</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">
-                {stats?.thisMonthMicrochips || 0}
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-600">Este Mês</p>
-                {stats?.growthPercentage !== undefined && stats.growthPercentage !== 0 && (
-                  <div className={`flex items-center text-sm ${getGrowthColor(stats.growthPercentage)}`}>
-                    {getGrowthIcon(stats.growthPercentage)}
-                    <span className="ml-1">
-                      {stats.growthPercentage > 0 ? '+' : ''}{stats.growthPercentage.toFixed(1)}%
-                    </span>
-                  </div>
-                )}
-              </div>
             </CardContent>
           </Card>
         </div>

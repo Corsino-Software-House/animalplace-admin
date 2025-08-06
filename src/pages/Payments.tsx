@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -10,17 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Search, Download } from 'lucide-react';
+
+import { Search, CreditCard, User, DollarSign } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getPaymentStats } from '@/services/get-payment-stats';
+// import { getPaymentStats } from '@/services/get-payment-stats';
 import { getPaymentsList } from '@/services/get-payments-list';
 
 export function Payments() {
@@ -29,10 +21,10 @@ export function Payments() {
   const [currentPage] = useState(1);
   const [pageSize] = useState(10);
 
-  const { data: paymentStats, isLoading: isLoadingStats } = useQuery({
-    queryKey: ['payment-stats'],
-    queryFn: getPaymentStats,
-  });
+  // const { data: paymentStats, isLoading: isLoadingStats } = useQuery({
+  //   queryKey: ['payment-stats'],
+  //   queryFn: getPaymentStats,
+  // });
 
   const { data: paymentsData, isLoading: isLoadingPayments } = useQuery({
     queryKey: ['payments-list', currentPage, pageSize],
@@ -98,21 +90,19 @@ export function Payments() {
   };
 
   return (
-    <div className="space-y-4 lg:space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Payments</h1>
-          <p className="text-gray-600 mt-2 text-sm lg:text-base">Track all transactions and payment history</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Pagamentos</h1>
+            <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Acompanhe todas as transações e histórico de pagamentos</p>
+          </div>
         </div>
-        <Button variant="outline" className="self-start lg:self-center">
-          <Download className="mr-2 h-4 w-4" />
-          Export
-        </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {isLoadingStats ? (
           // Skeleton para stats
           [...Array(4)].map((_, index) => (
@@ -154,16 +144,16 @@ export function Payments() {
             </Card>
           </>
         )}
-      </div>
+      </div> */}
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-3 sm:p-4 lg:pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search payments..."
+                placeholder="Pesquisar pagamentos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -171,13 +161,13 @@ export function Payments() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filtrar por status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="completed">Concluído</SelectItem>
+                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="failed">Falhou</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -187,9 +177,9 @@ export function Payments() {
       {/* Payments Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Transaction History ({filteredPayments.length})</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Histórico de Transações ({filteredPayments.length})</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           {isLoadingPayments ? (
             // Skeleton para tabela
             <div className="space-y-4">
@@ -206,62 +196,77 @@ export function Payments() {
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[120px]">Payment ID</TableHead>
-                    <TableHead className="min-w-[150px]">User</TableHead>
-                    <TableHead className="min-w-[200px] hidden lg:table-cell">Email</TableHead>
-                    <TableHead className="min-w-[100px]">Amount</TableHead>
-                    <TableHead className="min-w-[120px] hidden md:table-cell">Plan</TableHead>
-                    <TableHead className="min-w-[100px]">Status</TableHead>
-                    <TableHead className="min-w-[120px] hidden lg:table-cell">Method</TableHead>
-                    <TableHead className="min-w-[100px]">Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-              <TableBody>
-                {filteredPayments.length > 0 ? (
-                  filteredPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-mono text-xs lg:text-sm">{payment.paymentId.substring(0, 8)}...</TableCell>
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="font-medium">{payment.userName}</div>
-                          <div className="text-xs text-gray-500 lg:hidden">{payment.userEmail}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredPayments.length > 0 ? (
+                filteredPayments.map((payment) => (
+                  <Card key={payment.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-4">
+                        {/* Header com ID e status */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-5 w-5 text-gray-400" />
+                            <div className="font-mono text-sm">
+                              <div className="font-medium">#{payment.paymentId.substring(0, 12)}...</div>
+                              <div className="text-xs text-gray-500">{formatDate(payment.paymentDate)}</div>
+                            </div>
+                          </div>
+                          <Badge 
+                            variant={
+                              translateStatus(payment.status) === 'completed' ? 'default' : 
+                              translateStatus(payment.status) === 'pending' ? 'secondary' : 
+                              'destructive'
+                            }
+                            style={getStatusColor(translateStatus(payment.status))}
+                            className="text-xs px-2 py-1 flex-shrink-0"
+                          >
+                            {translateStatus(payment.status)}
+                          </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-gray-600 hidden lg:table-cell">{payment.userEmail}</TableCell>
-                      <TableCell className="font-semibold text-xs lg:text-sm">{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <Badge variant="outline" className="text-xs">{payment.planName}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={
-                            translateStatus(payment.status) === 'completed' ? 'default' : 
-                            translateStatus(payment.status) === 'pending' ? 'secondary' : 
-                            'destructive'
-                          }
-                          style={getStatusColor(translateStatus(payment.status))}
-                          className="text-xs"
-                        >
-                          {translateStatus(payment.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-gray-600 hidden lg:table-cell text-xs">{translatePaymentMethod(payment.paymentMethod)}</TableCell>
-                      <TableCell className="text-gray-600 text-xs">{formatDate(payment.paymentDate)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                      Nenhum pagamento encontrado
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                        
+                        {/* Usuário */}
+                        <div className="flex items-start gap-3">
+                          <User className="h-5 w-5 text-gray-400 mt-0.5" />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-sm truncate">{payment.userName}</div>
+                            <div className="text-xs text-gray-500 truncate">{payment.userEmail}</div>
+                          </div>
+                        </div>
+                        
+                        {/* Valor */}
+                        <div className="flex items-center gap-3">
+                          <DollarSign className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <div className="font-semibold text-xl text-green-600">{formatCurrency(payment.amount)}</div>
+                            <div className="text-xs text-gray-500">Valor do pagamento</div>
+                          </div>
+                        </div>
+                        
+                        {/* Plano e Método */}
+                        <div className="space-y-2">
+                          <div className="text-xs text-gray-400 font-medium">Detalhes:</div>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              📋 {payment.planName}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              💳 {translatePaymentMethod(payment.paymentMethod)}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-gray-500">
+                    <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-lg font-medium mb-2">Nenhum pagamento encontrado</p>
+                    <p className="text-sm">Nenhum pagamento corresponde aos filtros selecionados.</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
