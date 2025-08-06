@@ -29,10 +29,10 @@ export function useCreateService() {
       });
       queryClient.invalidateQueries({ queryKey: ['services'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao criar serviço',
+        description: 'Erro ao criar serviço',
         variant: "destructive",
       });
     },
@@ -54,10 +54,10 @@ export function useUpdateService() {
       });
       queryClient.invalidateQueries({ queryKey: ['services'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao atualizar serviço',
+        description: 'Erro ao atualizar serviço',
         variant: "destructive",
       });
     },
@@ -79,10 +79,10 @@ export function useDeleteService() {
       });
       queryClient.invalidateQueries({ queryKey: ['services'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao excluir serviço',
+        description: 'Erro ao excluir serviço',
         variant: "destructive",
       });
     },

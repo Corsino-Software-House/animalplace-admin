@@ -12,6 +12,7 @@ import { Plus, ArrowLeft, ArrowRight, Check, ChevronDown, ChevronRight, Loader2 
 import { useCreatePlan } from '@/hooks/usePlans';
 import { useServices } from '@/hooks/useServices';
 import { Plan, ServiceLimit, Period } from '@/types/plans';
+import { Service } from '@/types/services';
 
 interface CreatePlanModalProps {
   trigger?: React.ReactNode;
@@ -47,16 +48,15 @@ const getCategoryLabel = (category: string) => {
   return categoryLabels[category] || category;
 };
 
-// Função para agrupar serviços por categoria
-const groupServicesByCategory = (services: any[]) => {
-  return services.reduce((groups: Record<string, any[]>, service: any) => {
+const groupServicesByCategory = (services: Service[]) => {
+  return services.reduce((groups: Record<string, Service[]>, service: Service) => {
     const category = service.category;
     if (!groups[category]) {
       groups[category] = [];
     }
     groups[category].push(service);
     return groups;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, Service[]>);
 };
 
 export function CreatePlanModal({ trigger }: CreatePlanModalProps) {

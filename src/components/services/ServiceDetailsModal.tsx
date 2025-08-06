@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Eye, Edit, Trash2, Clock, DollarSign, AlertCircle } from 'lucide-react';
 import { useServiceById } from '@/hooks/useServices';
-import { Service, ServiceType, ServiceCategory } from '@/types/services';
+import { ServiceType, ServiceCategory } from '@/types/services';
 import { EditServiceModal } from './EditServiceModal';
 import { DeleteServiceDialog } from './DeleteServiceDialog';
 

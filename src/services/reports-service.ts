@@ -6,7 +6,8 @@ import {
   ReportsResponse, 
   CreateReportDto, 
   UpdateReportDto, 
-  FilterReportDto 
+  FilterReportDto,
+  ReportStatus
 } from "@/types/reports";
 
 export const reportsService = {
@@ -32,7 +33,7 @@ export const reportsService = {
   async getStatistics(): Promise<ReportStatistics> {
     const response = await api.get<ReportStatistics>(REPORTS_STATISTICS_ROUTE());
     return response.data;
-  },
+  },  
 
   // Get user's own reports
   async getMyReports(page: number = 1, limit: number = 10): Promise<ReportsResponse> {
@@ -100,14 +101,14 @@ export const reportsService = {
 
   // Helper methods for specific status filters
   async getPendingReports(page: number = 1, limit: number = 10): Promise<ReportsResponse> {
-    return this.getReports(page, limit, { status: 'pending' as any });
+    return this.getReports(page, limit, { status: 'pending' as ReportStatus });
   },
 
   async getInProgressReports(page: number = 1, limit: number = 10): Promise<ReportsResponse> {
-    return this.getReports(page, limit, { status: 'in_progress' as any });
+    return this.getReports(page, limit, { status: 'in_progress' as ReportStatus });
   },
 
   async getResolvedReports(page: number = 1, limit: number = 10): Promise<ReportsResponse> {
-    return this.getReports(page, limit, { status: 'resolved' as any });
+    return this.getReports(page, limit, { status: 'resolved' as ReportStatus });
   },
 };

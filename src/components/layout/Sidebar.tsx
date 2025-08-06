@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Image, CreditCard, Package, Settings, Calendar, Zap, Gift, BarChart3, PawPrint as Paw, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Image, CreditCard, Package, Settings, Calendar, Zap, Gift, PawPrint as Paw, LogOut, X } from 'lucide-react';
 import { useAuth, useLogout } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 // import { useState, useEffect } from 'react';

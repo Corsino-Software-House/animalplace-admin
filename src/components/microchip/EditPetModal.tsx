@@ -48,8 +48,8 @@ export function EditPetModal({ pet, trigger }: EditPetModalProps) {
       queryClient.invalidateQueries({ queryKey: ['microchip-stats'] });
       setOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Erro ao atualizar pet');
+    onError: (error: unknown) => {
+      toast.error((error as Error).message || 'Erro ao atualizar pet');
     }
   });
 

@@ -26,7 +26,8 @@ import { useState } from 'react';
 import { 
   ReportType, 
   ReportStatus, 
-  ReportPriority
+  ReportPriority,
+  Report
 } from '@/types/reports';
 import { reportsService } from '@/services/reports-service';
 import { CreateReportModal } from '@/components/report/CreateReportModal';
@@ -124,28 +125,28 @@ export function Reports() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [respondMode, setRespondMode] = useState<'respond' | 'complete'>('respond');
 
   // Modal handlers
-  const handleViewReport = (report: any) => {
+  const handleViewReport = (report: Report) => {
     setSelectedReport(report);
     setIsViewModalOpen(true);
   };
 
-  const handleRespondReport = (report: any) => {
+  const handleRespondReport = (report: Report) => {
     setSelectedReport(report);
     setRespondMode('respond');
     setIsRespondModalOpen(true);
   };
 
-  const handleCompleteReport = (report: any) => {
+  const handleCompleteReport = (report: Report) => {
     setSelectedReport(report);
     setRespondMode('complete');
     setIsRespondModalOpen(true);
   };
 
-  const handleDeleteReport = (report: any) => {
+  const handleDeleteReport = (report: Report) => {
     setSelectedReport(report);
     setIsDeleteModalOpen(true);
   };

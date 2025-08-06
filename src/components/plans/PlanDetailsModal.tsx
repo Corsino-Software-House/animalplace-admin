@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Eye, Edit, Trash2, Check, AlertCircle } from 'lucide-react';
 import { usePlanById } from '@/hooks/usePlans';
 import { useServices } from '@/hooks/useServices';
-import { Plan } from '@/types/plans';
 import { EditPlanModal } from './EditPlanModal';
 import { DeletePlanDialog } from './DeletePlanDialog';
 
