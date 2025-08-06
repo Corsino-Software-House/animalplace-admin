@@ -24,7 +24,12 @@ export default function Login() {
 
     try {
       await loginMutation.mutateAsync(loginData);
-      navigate('/dashboard');
+      
+      // Aguardar um momento para garantir que a autenticação foi processada
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
+      
     } catch {
       // Erro já tratado no hook
     } finally {
@@ -117,13 +122,6 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
-            © 2024 AnimalPlace. Todos os direitos reservados.
-          </p>
-        </div>
       </div>
     </div>
   );

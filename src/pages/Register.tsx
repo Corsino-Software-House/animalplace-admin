@@ -15,11 +15,9 @@ export default function Register() {
   const { toast } = useToast();
   const registerMutation = useRegister();
 
-  // Registration form state
   const [registerData, setRegisterData] = useState({
     name: '',
     email: '',
-    rg: '',
     cpf: '',
     endereco_completo: '',
     cep: '',
@@ -33,7 +31,6 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Basic validation
     if (registerData.password !== registerData.confirmPassword) {
       toast({
         title: "Falha no cadastro",
@@ -55,29 +52,35 @@ export default function Register() {
     }
 
     try {
-      // Remove confirmPassword before sending
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...submitData } = registerData;
       await registerMutation.mutateAsync(submitData);
       
       toast({
         title: "Cadastro realizado com sucesso",
-        description: "Sua conta foi criada. Agora você pode fazer login.",
+        description: "Enviamos um código de verificação para seu email.",
       });
       
-      navigate('/login');
-    } catch {
-      // Error already handled in hook
+      // Redireciona para a página de verificação com o email
+      navigate('/verify-email', { 
+        state: { email: registerData.email },
+        replace: true 
+      });
+    } catch (error) {
+      console.error('Erro no cadastro:', error);
+      toast({
+        title: "Falha no cadastro",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao criar sua conta. Por favor, tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const formatCPF = (value: string) => {
-    // Remove all non-digits
     const digits = value.replace(/\D/g, '');
     
-    // Apply CPF mask: XXX.XXX.XXX-XX
     if (digits.length <= 11) {
       return digits
         .replace(/(\d{3})(\d)/, '$1.$2')
@@ -121,7 +124,6 @@ export default function Register() {
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-2xl mx-auto font-space-grotesk">
-        {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <Paw className="h-12 w-12" style={{ color: '#95CA3C' }} />
@@ -130,7 +132,6 @@ export default function Register() {
           <p className="text-gray-600">Admin Dashboard</p>
         </div>
 
-        {/* Register Card */}
         <Card className="border w-full border-gray-200 shadow-sm">
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl font-semibold text-center">
@@ -178,42 +179,22 @@ export default function Register() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rg" className="text-sm font-medium">
-                    RG
-                  </Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="rg"
-                      type="text"
-                      placeholder="12.345.678-9"
-                      value={registerData.rg}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, rg: e.target.value }))}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cpf" className="text-sm font-medium">
-                    CPF
-                  </Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      id="cpf"
-                      type="text"
-                      placeholder="000.000.000-00"
-                      value={registerData.cpf}
-                      onChange={handleCPFChange}
-                      className="pl-10"
-                      maxLength={14}
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="cpf" className="text-sm font-medium">
+                  CPF
+                </Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    id="cpf"
+                    type="text"
+                    placeholder="000.000.000-00"
+                    value={registerData.cpf}
+                    onChange={handleCPFChange}
+                    className="pl-10"
+                    maxLength={14}
+                    required
+                  />
                 </div>
               </div>
 
@@ -338,7 +319,6 @@ export default function Register() {
               </Button>
             </form>
 
-            {/* Link to login */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Já tem uma conta?{' '}
@@ -354,12 +334,6 @@ export default function Register() {
           </CardContent>
         </Card>
 
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
-            © 2024 AnimalPlace. Todos os direitos reservados.
-          </p>
-        </div>
       </div>
     </div>
   );
