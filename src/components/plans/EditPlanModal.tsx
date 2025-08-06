@@ -52,7 +52,7 @@ export function EditPlanModal({ plan, trigger }: EditPlanModalProps) {
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[95vh] overflow-y-auto mx-4 sm:mx-0">
+      <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-[600px] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">Editar Plano - {plan.name}</DialogTitle>
         </DialogHeader>

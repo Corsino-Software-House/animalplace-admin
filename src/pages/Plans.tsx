@@ -51,8 +51,8 @@ export function Plans() {
   // Calcular estatísticas - usar planos filtrados
   const totalPlans = filteredPlans?.length || 0;
   const activePlans = filteredPlans?.filter(plan => plan.isActive).length || 0;
-  const totalServices = filteredPlans?.reduce((acc, plan) => acc + (plan.services?.length || 0), 0) || 0;
-  const totalFreeServices = filteredPlans?.reduce((acc, plan) => acc + (plan.allowedServiceNames?.length || 0), 0) || 0;
+  const totalServices = filteredPlans?.reduce((acc, plan) => acc + (plan.serviceIds?.length || 0), 0) || 0;
+  const totalFreeServices = filteredPlans?.reduce((acc, plan) => acc + (plan.freeServices?.length || 0), 0) || 0;
   if (error) {
     return (
       <div className="space-y-6 p-4 sm:p-6">
@@ -224,22 +224,19 @@ export function Plans() {
                         <p className="line-clamp-2">{plan.description}</p>
                       </div>
                       
-                      {plan.allowedServiceNames && plan.allowedServiceNames.length > 0 && (
+                      {plan.serviceIds && plan.serviceIds.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs sm:text-sm font-medium">Serviços Permitidos:</p>
-                          <ul className="space-y-1">
-                            {plan.allowedServiceNames.slice(0, 3).map((serviceName, index) => (
-                              <li key={index} className="flex items-start text-xs sm:text-sm text-gray-600 gap-2">
-                                <Check className="mt-0.5 h-3 w-3 shrink-0" style={{ color: '#95CA3C' }} />
-                                <span className="truncate">{serviceName}</span>
-                              </li>
-                            ))}
-                            {plan.allowedServiceNames.length > 3 && (
-                              <li className="text-xs sm:text-sm text-gray-500 ml-5">
-                                +{plan.allowedServiceNames.length - 3} mais serviços...
-                              </li>
-                            )}
-                          </ul>
+                          <p className="text-xs sm:text-sm font-medium">Serviços Incluídos:</p>
+                          <div className="flex items-center text-xs sm:text-sm text-gray-600 gap-2">
+                            <Check className="h-3 w-3 shrink-0" style={{ color: '#95CA3C' }} />
+                            <span>{plan.serviceIds.length} serviços disponíveis</span>
+                          </div>
+                          {plan.freeServices && plan.freeServices.length > 0 && (
+                            <div className="flex items-center text-xs sm:text-sm text-green-600 gap-2">
+                              <Check className="h-3 w-3 shrink-0" />
+                              <span>{plan.freeServices.length} gratuitos</span>
+                            </div>
+                          )}
                         </div>
                       )}
 

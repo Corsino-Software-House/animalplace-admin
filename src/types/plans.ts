@@ -14,12 +14,6 @@ export interface ConsultationTypeLimit {
 export interface SpecialRules {
   microchipFree: boolean;
   aestheticViaApp: boolean;
-  consultationTypes: Record<string, ConsultationTypeLimit>;
-  highComplexitySurgeries?: {
-    services: string[];
-    limit: number;
-    carencyDays: number;
-  };
 }
 
 export interface Service {
@@ -44,20 +38,19 @@ export interface Plan {
   duration: number;
   isActive: boolean;
   mainColor: string;
+  serviceIds?: string[];
   serviceLimits: {
-    exam: ServiceLimit;
-    surgery: ServiceLimit;
-    vaccine: ServiceLimit;
-    procedure: ServiceLimit;
-    anesthesia: ServiceLimit;
-    consultation: ServiceLimit;
-    hospitalization: ServiceLimit;
-    bath_and_grooming: ServiceLimit;
+    exam?: ServiceLimit;
+    surgery?: ServiceLimit;
+    vaccine?: ServiceLimit;
+    procedure?: ServiceLimit;
+    anesthesia?: ServiceLimit;
+    consultation?: ServiceLimit;
+    hospitalization?: ServiceLimit;
+    bath_and_grooming?: ServiceLimit;
   };
   freeServices?: string[];
   appPurchaseServices?: string[];
-  allowedServiceNames?: string[];
-  servicesToCreate?: ServiceToCreate[];
   specialRules: SpecialRules;
   services?: Service[];
 }
