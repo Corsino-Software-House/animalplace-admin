@@ -82,7 +82,7 @@ export const useVerifyEmailCode = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem('animalplace_token', data.token);
+      localStorage.setItem('animalplace_token', data.token || '');
       localStorage.setItem('animalplace_user', JSON.stringify(data.user));
       
       toast.success(data.message);
