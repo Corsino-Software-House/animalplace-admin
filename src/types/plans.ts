@@ -14,7 +14,6 @@ export interface ConsultationTypeLimit {
 export interface SpecialRules {
   microchipFree: boolean;
   aestheticViaApp: boolean;
-  consultationTypes: Record<string, ConsultationTypeLimit>;
 }
 
 export interface Service {
@@ -35,22 +34,34 @@ export interface Plan {
   id?: string;
   name: string;
   description: string;
-  suggestedPrice: string;
+  suggestedPrice: number;
   duration: number;
   isActive: boolean;
   mainColor: string;
+  serviceIds?: string[];
   serviceLimits: {
-    exam: ServiceLimit;
-    surgery: ServiceLimit;
-    vaccine: ServiceLimit;
-    procedure: ServiceLimit;
-    anesthesia: ServiceLimit;
-    consultation: ServiceLimit;
-    hospitalization: ServiceLimit;
-    bath_and_grooming: ServiceLimit;
+    exam?: ServiceLimit;
+    surgery?: ServiceLimit;
+    vaccine?: ServiceLimit;
+    procedure?: ServiceLimit;
+    anesthesia?: ServiceLimit;
+    consultation?: ServiceLimit;
+    hospitalization?: ServiceLimit;
+    bath_and_grooming?: ServiceLimit;
   };
-  freeServices: string[];
-  appPurchaseServices: string[];
+  freeServices?: string[];
+  appPurchaseServices?: string[];
   specialRules: SpecialRules;
-  services: Service[];
+  services?: Service[];
+}
+
+export interface ServiceToCreate {
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  type: string;
+  category: string;
+  isActive: boolean;
+  defaultLimits: ServiceLimit;
 }
