@@ -76,7 +76,7 @@ export function useSchedule() {
 
   useEffect(() => {
     fetchSchedules();
-  }, []);
+  });
 
   return {
     schedules,

@@ -9,7 +9,7 @@ export interface UploadProgress {
   completed?: boolean;
   failed?: boolean;
   error?: string;
-  result?: any;
+  result?: unknown;
 }
 
 export const useReportUpload = () => {
@@ -62,7 +62,7 @@ export const useReportUpload = () => {
             }, 2000);
             
             resolve(result);
-          } catch (error) {
+          } catch {
             setUploadProgress({
               progress: 0,
               stage: 'Erro ao processar resposta',
@@ -76,7 +76,7 @@ export const useReportUpload = () => {
           try {
             const errorResponse = JSON.parse(xhr.responseText);
             errorMessage = errorResponse.message || errorMessage;
-          } catch (e) {
+          } catch {
             // Keep default error message
           }
           

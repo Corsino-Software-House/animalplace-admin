@@ -54,8 +54,8 @@ export function RegisterMicrochipModal({ trigger }: RegisterMicrochipModalProps)
       setOpen(false);
       resetForm();
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Erro ao registrar microchip');
+    onError: (error: unknown) => {
+      toast.error((error as Error).message || 'Erro ao registrar microchip');
     }
   });
 

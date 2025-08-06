@@ -41,10 +41,10 @@ export function useCreatePlan() {
       });
       queryClient.invalidateQueries({ queryKey: ['plans'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao criar plano',
+        description: 'Erro ao criar plano',
         variant: "destructive",
       });
     },
@@ -66,10 +66,10 @@ export function useUpdatePlan() {
       });
       queryClient.invalidateQueries({ queryKey: ['plans'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao atualizar plano',
+        description: 'Erro ao atualizar plano',
         variant: "destructive",
       });
     },
@@ -91,10 +91,10 @@ export function useDeletePlan() {
       });
       queryClient.invalidateQueries({ queryKey: ['plans'] });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
         title: "Erro",
-        description: error?.response?.data?.message || 'Erro ao excluir plano',
+        description: 'Erro ao excluir plano',
         variant: "destructive",
       });
     },
