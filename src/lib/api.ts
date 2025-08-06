@@ -8,6 +8,7 @@ export const api = axios.create({
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
   },
+  withCredentials: true, // Importante para enviar cookies automaticamente
 });
 
 // Flag para evitar múltiplas tentativas de refresh simultâneas
@@ -17,12 +18,12 @@ let failedQueue: Array<{
   reject: (error: any) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: any, success: boolean = false) => {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
     } else {
-      resolve(token);
+      resolve(success);
     }
   });
   
@@ -30,37 +31,36 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 // Função para tentar renovar o token
-const refreshToken = async (): Promise<string | null> => {
+const refreshToken = async (): Promise<boolean> => {
   try {
-    const refreshToken = localStorage.getItem('animalplace_refresh_token');
-    const userId = localStorage.getItem('animalplace_user_id');
-    
-    if (!refreshToken || !userId) {
-      throw new Error('Refresh token ou user ID não encontrado');
+    // Como os tokens estão em cookies HTTP-Only, não precisamos buscá-los do localStorage
+    // O refresh será feito apenas com os cookies que o navegador envia automaticamente
+    const userString = localStorage.getItem('animalplace_user');
+    if (!userString) {
+      throw new Error('Usuário não encontrado');
     }
-
+    
+    const user = JSON.parse(userString);
+    
     const response = await axios.post<RefreshTokenResponse>(
-      `${env.BASE_URL_API}/auth/refresh`,
+      `${env.BASE_URL_API}/auth/refresh-token`,
       {
-        refreshToken,
-        userId,
+        refreshToken: '', // Será lido do cookie pelo backend
+        userId: user.id,
       } as RefreshTokenRequest,
       {
         headers: {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true',
-        }
+        },
+        withCredentials: true, // Importante para enviar cookies
       }
     );
 
-    if (response.data.success && response.data.data) {
-      const { token, refreshToken: newRefreshToken } = response.data.data;
-      
-      // Atualizar tokens no localStorage
-      localStorage.setItem('animalplace_token', token);
-      localStorage.setItem('animalplace_refresh_token', newRefreshToken);
-      
-      return token;
+    if (response.data.success) {
+      // Com cookies HTTP-Only, não precisamos armazenar tokens no localStorage
+      // Os novos tokens já foram definidos como cookies pelo backend
+      return true;
     }
     
     throw new Error('Falha ao renovar token');
@@ -68,21 +68,17 @@ const refreshToken = async (): Promise<string | null> => {
     console.error('Erro ao renovar token:', error);
     
     // Limpar dados de autenticação
-    localStorage.removeItem('animalplace_token');
-    localStorage.removeItem('animalplace_refresh_token');
     localStorage.removeItem('animalplace_user');
-    localStorage.removeItem('animalplace_user_id');
     
-    return null;
+    return false;
   }
 };
 
-// Interceptor para adicionar token nas requisições
+// Interceptor para adicionar credenciais nas requisições
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('animalplace_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // Com cookies HTTP-Only, não precisamos adicionar token manualmente
+  // Mas precisamos garantir que os cookies sejam enviados
+  config.withCredentials = true;
   return config;
 });
 
@@ -94,18 +90,21 @@ api.interceptors.response.use(
     
     // Verificar se é um erro 401 (Unauthorized) em uma requisição autenticada
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Verificar se a requisição tinha token de autorização
-      const hasAuthHeader = originalRequest?.headers?.Authorization;
+      // Verificar se temos dados de usuário (indicando que estávamos autenticados)
+      const userString = localStorage.getItem('animalplace_user');
       
-      // Se tinha token e deu 401, tentar renovar o token
-      if (hasAuthHeader) {
+      // Se temos usuário e deu 401, tentar renovar o token
+      if (userString) {
         if (isRefreshing) {
           // Se já está tentando renovar, adicionar à fila
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
-          }).then(token => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
+          }).then(success => {
+            if (success) {
+              return api(originalRequest);
+            } else {
+              return Promise.reject(error);
+            }
           }).catch(err => {
             return Promise.reject(err);
           });
@@ -115,21 +114,20 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          const newToken = await refreshToken();
+          const renewalSuccess = await refreshToken();
           
-          if (newToken) {
+          if (renewalSuccess) {
             // Token renovado com sucesso
-            processQueue(null, newToken);
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            processQueue(null, true);
             return api(originalRequest);
           } else {
             // Falha ao renovar token - fazer logout
-            processQueue(error, null);
+            processQueue(error, false);
             redirectToLogin();
             return Promise.reject(error);
           }
         } catch (refreshError) {
-          processQueue(refreshError, null);
+          processQueue(refreshError, false);
           redirectToLogin();
           return Promise.reject(refreshError);
         } finally {

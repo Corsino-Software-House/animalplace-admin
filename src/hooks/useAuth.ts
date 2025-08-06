@@ -112,6 +112,10 @@ export const useLogout = () => {
   return () => {
     clearAuth();
     queryClient.clear();
+    // Fazer logout no backend para limpar cookies
+    api.post('/auth/logout').catch(() => {
+      // Se falhar, não há problema, só limpar dados localmente
+    });
     window.location.href = '/login';
   };
 };
@@ -119,6 +123,7 @@ export const useLogout = () => {
 // Função para limpar dados de autenticação
 export const clearAuth = () => {
   localStorage.removeItem('animalplace_user');
+  // Nota: os tokens ficam em cookies HTTP-Only e são limpos pelo backend
 };
 
 // Função para verificar se o token está válido (formato básico)
