@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { GET_ONE_PLAN_ROUTE, PLANS_ROUTE } from "@/lib/api-routes";
+import { ONE_PLAN_ROUTE, PLANS_ROUTE } from "@/lib/api-routes";
 import { Plan } from "@/types/plans";
 
 export const getPlans = async () => {
@@ -8,7 +8,7 @@ export const getPlans = async () => {
 };
 
 export const getPlanById = async (id: string) => {
-  const response = await api.get<Plan>(GET_ONE_PLAN_ROUTE(id));
+  const response = await api.get<Plan>(ONE_PLAN_ROUTE(id));
   return response.data;
 };
 
@@ -18,11 +18,11 @@ export const createPlan = async (plan: Omit<Plan, 'id'>) => {
 };
 
 export const updatePlan = async (id: string, plan: Partial<Plan>) => {
-  const response = await api.put<Plan>(GET_ONE_PLAN_ROUTE(id), plan);
+  const response = await api.patch<Plan>(ONE_PLAN_ROUTE(id), plan);
   return response.data;
 };
 
 export const deletePlan = async (id: string) => {
-  const response = await api.delete(GET_ONE_PLAN_ROUTE(id));
+  const response = await api.delete(ONE_PLAN_ROUTE(id));
   return response.data;
 };
