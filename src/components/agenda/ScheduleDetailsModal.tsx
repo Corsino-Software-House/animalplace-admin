@@ -14,9 +14,6 @@ import {
   Calendar,
   Clock,
   User,
-  Phone,
-  Mail,
-  MapPin,
   Heart,
   FileText,
   DollarSign,
@@ -36,7 +33,6 @@ export function ScheduleDetailsModal({
   if (!schedule) return null;
 
   const scheduledDate = new Date(schedule.data_hora);
-  const petBirthDate = new Date(schedule.pet.data_nascimento);
   
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -66,24 +62,24 @@ export function ScheduleDetailsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
             Detalhes do Agendamento
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Status e Data/Hora */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+              <span className="font-medium text-sm sm:text-base">
                 {format(scheduledDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
               </span>
             </div>
-            <Badge className={getStatusColor(schedule.status)}>
+            <Badge className={`${getStatusColor(schedule.status)} text-xs sm:text-sm px-2 py-1`}>
               {schedule.status}
             </Badge>
           </div>
@@ -92,29 +88,20 @@ export function ScheduleDetailsModal({
 
           {/* Informações do Cliente */}
           <Card>
-            <CardContent className="pt-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
-                <User className="h-4 w-4 text-gray-500" />
-                <h3 className="font-medium">Informações do Cliente</h3>
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                <h3 className="font-medium text-sm sm:text-base">Informações do Cliente</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                <div className="space-y-2">
                   <p><strong>Nome:</strong> {schedule.user.name}</p>
-                  <p><strong>CPF:</strong> {schedule.user.cpf}</p>
-                  <p><strong>RG:</strong> {schedule.user.rg}</p>
+                  <p><strong>Email:</strong> {schedule.user.email}</p>
+                  <p><strong>Telefone:</strong> {schedule.user.telefone}</p>
                 </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    <Phone className="h-3 w-3" />
-                    <span>{schedule.user.telefone}</span>
-                  </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Mail className="h-3 w-3" />
-                    <span>{schedule.user.email}</span>
-                  </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="h-3 w-3" />
-                    <span className="text-xs">{schedule.user.endereco_completo}</span>
+                <div className="space-y-2">
+                  <div className="text-xs text-gray-600">
+                    <p>Informações de contato já exibidas acima</p>
                   </div>
                 </div>
               </div>
@@ -123,33 +110,28 @@ export function ScheduleDetailsModal({
 
           {/* Informações do Pet */}
           <Card>
-            <CardContent className="pt-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Heart className="h-4 w-4 text-gray-500" />
-                <h3 className="font-medium">Informações do Pet</h3>
+                <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                <h3 className="font-medium text-sm sm:text-base">Informações do Pet</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                <div className="space-y-2">
                   <p><strong>Nome:</strong> {schedule.pet.nome}</p>
-                  <p><strong>Tipo:</strong> {schedule.pet.tipo_animal}</p>
-                  <p><strong>Raça:</strong> {schedule.pet.raca}</p>
                   <p><strong>Sexo:</strong> {schedule.pet.sexo}</p>
-                </div>
-                <div>
-                  <p><strong>Nascimento:</strong> {format(petBirthDate, 'dd/MM/yyyy', { locale: ptBR })}</p>
+                  <p><strong>Raça:</strong> {schedule.pet.raca}</p>
                   <p><strong>Peso:</strong> {schedule.pet.peso} kg</p>
-                  <p><strong>Pelagem:</strong> {schedule.pet.pelagem}</p>
-                  <p><strong>Castrado:</strong> {schedule.pet.castrado ? 'Sim' : 'Não'}</p>
+                </div>
+                <div className="space-y-2">
+                  <p><strong>Microchip:</strong> {schedule.pet.microchip_number || 'Não informado'}</p>
                 </div>
               </div>
               
               {schedule.pet.microchip_number && (
                 <>
                   <Separator className="my-3" />
-                  <div className="text-xs text-gray-600">
-                    <p><strong>Microchip:</strong> {schedule.pet.microchip_number}</p>
-                    <p><strong>Fabricante:</strong> {schedule.pet.microchip_manufacturer}</p>
-                    <p><strong>Local:</strong> {schedule.pet.microchip_location}</p>
+                  <div className="text-xs text-gray-600 space-y-1">
+                    <p><strong>Microchip registrado:</strong> {schedule.pet.microchip_number}</p>
                   </div>
                 </>
               )}
@@ -158,33 +140,33 @@ export function ScheduleDetailsModal({
 
           {/* Serviços */}
           <Card>
-            <CardContent className="pt-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="h-4 w-4 text-gray-500" />
-                <h3 className="font-medium">Serviços Agendados</h3>
+                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                <h3 className="font-medium text-sm sm:text-base">Serviços Agendados</h3>
               </div>
               <div className="space-y-3">
                 {schedule.services.map((service) => (
-                  <div key={service.id} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium">{service.name}</p>
-                      <p className="text-sm text-gray-600">{service.description}</p>
-                      <div className="flex gap-4 mt-1 text-xs text-gray-500">
+                  <div key={service.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">{service.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{service.description}</p>
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 mt-1 text-xs text-gray-500">
                         <span>Duração: {service.duration} min</span>
                         <span>Categoria: {service.category}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-green-600">
+                    <div className="text-left sm:text-right shrink-0">
+                      <p className="font-medium text-green-600 text-sm sm:text-base">
                         R$ {parseFloat(service.price || '0').toFixed(2)}
                       </p>
                     </div>
                   </div>
                 ))}
                 <Separator />
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center font-medium text-sm sm:text-base">
                   <span>Total:</span>
-                  <span className="text-lg text-green-600">
+                  <span className="text-base sm:text-lg text-green-600">
                     R$ {totalPrice.toFixed(2)}
                   </span>
                 </div>
@@ -195,12 +177,12 @@ export function ScheduleDetailsModal({
           {/* Observações */}
           {schedule.observacoes && (
             <Card>
-              <CardContent className="pt-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <FileText className="h-4 w-4 text-gray-500" />
-                  <h3 className="font-medium">Observações</h3>
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                  <h3 className="font-medium text-sm sm:text-base">Observações</h3>
                 </div>
-                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-3 rounded-lg leading-relaxed">
                   {schedule.observacoes}
                 </p>
               </CardContent>

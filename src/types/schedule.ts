@@ -32,46 +32,20 @@ export interface AppointmentRequest {
 
 export interface Scheduling {
   id: string;
-  message: string;
   pet: {
     id_pet: string;
-    user_id: string;
     nome: string;
-    tipo_animal: string;
     sexo: string;
-    data_nascimento: string;
     raca: string;
-    pelagem: string;
     peso: string;
-    microchip_number: string;
-    microchip_implantation_date: string;
-    microchip_manufacturer: string;
-    microchip_location: string;
-    castrado: boolean;
-    created_at: string;
-    updated_at: string;
+    microchip_number: string | null;
   };
   pet_id: string;
   user: {
     id: string;
     name: string;
-    cpf: string;
-    rg: string;
-    endereco_completo: string;
-    cep: string;
     telefone: string;
     email: string;
-    passwordHash: string;
-    createdAt: string;
-    role: string;
-    isEmailVerified: boolean;
-    verificationToken: string | null;
-    verificationTokenExpiration: string | null;
-    resetToken: string | null;
-    resetTokenExpiration: string | null;
-    created_at: string;
-    updated_at: string;
-    expo_push_token: string | null;
   };
   user_id: string;
   data_hora: string;
@@ -83,14 +57,6 @@ export interface Scheduling {
     duration: number;
     type: string;
     category: string;
-    isActive: boolean;
-    defaultLimits: {
-      limit: number;
-      period: string;
-      carencyDays: number;
-    };
-    createdAt: string;
-    updatedAt: string;
   }>;
   status: string;
   observacoes: string;

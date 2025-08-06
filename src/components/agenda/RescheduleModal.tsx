@@ -22,7 +22,7 @@ interface RescheduleModalProps {
   schedule: Scheduling | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onReschedule: (id: string, data: Scheduling) => Promise<boolean>;
+  onReschedule: (id: string, data: { data_hora: string }) => Promise<boolean>;
   loading: boolean;
 }
 
@@ -45,13 +45,11 @@ export function RescheduleModal({
     const [hours, minutes] = time.split(':');
     dateTime.setHours(parseInt(hours), parseInt(minutes));
 
-    const updatedSchedule: Scheduling = {
-      ...schedule,
+    const rescheduleData = {
       data_hora: dateTime.toISOString(),
-      observacoes: observations || schedule.observacoes,
     };
 
-    const success = await onReschedule(schedule.id, updatedSchedule);
+    const success = await onReschedule(schedule.id, rescheduleData);
     if (success) {
       onOpenChange(false);
       setDate(undefined);
@@ -64,45 +62,45 @@ export function RescheduleModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Reagendar Consulta</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Reagendar Consulta</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div className="space-y-2">
-            <Label>Cliente</Label>
-            <Input value={schedule.user.name} disabled />
+            <Label className="text-sm sm:text-base">Cliente</Label>
+            <Input value={schedule.user.name} disabled className="text-sm sm:text-base" />
           </div>
           
           <div className="space-y-2">
-            <Label>Pet</Label>
-            <Input value={schedule.pet.nome} disabled />
+            <Label className="text-sm sm:text-base">Pet</Label>
+            <Input value={schedule.pet.nome} disabled className="text-sm sm:text-base" />
           </div>
 
           <div className="space-y-2">
-            <Label>Serviços</Label>
-            <div className="text-sm text-gray-600">
+            <Label className="text-sm sm:text-base">Serviços</Label>
+            <div className="text-xs sm:text-sm text-gray-600 p-2 bg-gray-50 rounded-md">
               {schedule.services.map(service => service.name).join(', ')}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label>Nova Data</Label>
+              <Label className="text-sm sm:text-base">Nova Data</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      'w-full justify-start text-left font-normal',
+                      'w-full justify-start text-left font-normal text-sm sm:text-base h-9 sm:h-10',
                       !date && 'text-muted-foreground'
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     {date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecionar data'}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -115,14 +113,14 @@ export function RescheduleModal({
             </div>
 
             <div className="space-y-2">
-              <Label>Novo Horário</Label>
+              <Label className="text-sm sm:text-base">Novo Horário</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                 <Input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-sm sm:text-base h-9 sm:h-10"
                   required
                 />
               </div>
@@ -130,21 +128,23 @@ export function RescheduleModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Observações (opcional)</Label>
+            <Label className="text-sm sm:text-base">Observações (opcional)</Label>
             <Textarea
               value={observations}
               onChange={(e) => setObservations(e.target.value)}
               placeholder="Observações sobre o reagendamento..."
               rows={3}
+              className="text-sm sm:text-base resize-none"
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="w-full sm:w-auto text-sm sm:text-base h-9 sm:h-10"
             >
               Cancelar
             </Button>
@@ -152,7 +152,7 @@ export function RescheduleModal({
               type="submit"
               disabled={loading || !date || !time}
               style={{ backgroundColor: '#95CA3C' }}
-              className="text-white hover:opacity-90"
+              className="w-full sm:w-auto text-white hover:opacity-90 text-sm sm:text-base h-9 sm:h-10"
             >
               {loading ? 'Reagendando...' : 'Reagendar'}
             </Button>

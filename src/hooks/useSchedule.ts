@@ -28,7 +28,7 @@ export function useSchedule() {
     }
   };
 
-  const reschedule = async (id: string, data: Scheduling) => {
+  const reschedule = async (id: string, data: { data_hora: string }) => {
     try {
       setLoading(true);
       await rescheduleService(id, data);

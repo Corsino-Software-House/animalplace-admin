@@ -7,8 +7,8 @@ export const getScheduleService = async (): Promise<Scheduling[]> => {
   return response.data;
 };
 
-export const rescheduleService = async (id: string, data: Scheduling): Promise<Scheduling> => {
-  const response = await api.post<Scheduling>(RESCHEDULE_SERVICE_ROUTE(id), data);
+export const rescheduleService = async (id: string, data: { data_hora: string }): Promise<Scheduling> => {
+  const response = await api.patch<Scheduling>(RESCHEDULE_SERVICE_ROUTE(id), data);
   return response.data;
 };
 
