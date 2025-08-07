@@ -8,7 +8,9 @@ import { AlertCircle, CheckCircle, DollarSign, RefreshCw, Activity } from 'lucid
 import { usePaymentDiagnosis, usePaymentStats } from '@/hooks/usePaymentSync';
 
 export function PaymentSyncPanel() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [diagnosisResult, setDiagnosisResult] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [statsResult, setStatsResult] = useState<any>(null);
   
   const diagnosisMutation = usePaymentDiagnosis();

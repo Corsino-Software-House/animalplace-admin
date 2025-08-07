@@ -31,9 +31,9 @@ export const usePaymentDiagnosis = () => {
         toast.success('✅ Diagnóstico concluído! Nenhum problema encontrado.');
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Erro no diagnóstico:', error);
-      toast.error('❌ Erro ao executar diagnóstico de pagamentos');
+      toast.error('Erro ao executar diagnóstico de pagamentos');
     },
   });
 };
@@ -44,9 +44,9 @@ export const usePaymentStats = () => {
       const response = await api.get('/api/payments/stats');
       return response.data;
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Erro ao buscar estatísticas:', error);
-      toast.error('❌ Erro ao buscar estatísticas de pagamentos');
+      toast.error('Erro ao buscar estatísticas de pagamentos');
     },
   });
 };
