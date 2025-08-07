@@ -76,7 +76,8 @@ export function useSchedule() {
 
   useEffect(() => {
     fetchSchedules();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, []);
 
   return {
     schedules,
