@@ -13,7 +13,6 @@ import {
   DollarSign, 
   CalendarDays, 
   Settings,
-  BarChart3,
   TrendingUp,
   AlertCircle,
   RefreshCw
@@ -23,7 +22,6 @@ import { getDashboardOverview } from '@/services/get-dashboard-overview';
 import { getRecentActivity } from '@/services/get-recent-activity';
 import { getSubscriptionMetrics } from '@/services/get-subscription-metrics';
 import { getSchedulingMetrics } from '@/services/get-scheduling-metrics';
-import { getServiceMetrics } from '@/services/get-service-metrics';
 import { useState } from 'react';
 
 export function Dashboard() {
@@ -47,11 +45,6 @@ export function Dashboard() {
   const { data: schedulingMetrics, isLoading: isLoadingScheduling } = useQuery({
     queryKey: ['scheduling-metrics'],
     queryFn: getSchedulingMetrics,
-  });
-
-  const { data: serviceMetrics, isLoading: isLoadingServices } = useQuery({
-    queryKey: ['service-metrics'],
-    queryFn: getServiceMetrics,
   });
 
   const refreshData = () => {
@@ -293,10 +286,9 @@ export function Dashboard() {
         </div>
 
         <Tabs defaultValue="subscriptions" className="space-y-4 lg:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1">
             <TabsTrigger value="subscriptions" className="text-xs lg:text-sm py-2">Assinaturas</TabsTrigger>
             <TabsTrigger value="scheduling" className="text-xs lg:text-sm py-2">Agendamentos</TabsTrigger>
-            <TabsTrigger value="services" className="text-xs lg:text-sm py-2">Serviços</TabsTrigger>
           </TabsList>
 
 
@@ -476,88 +468,6 @@ export function Dashboard() {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <p>Dados de agendamentos não disponíveis</p>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Services Tab */}
-          <TabsContent value="services" className="space-y-4 lg:space-y-6">
-            {isLoadingServices ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                {[...Array(2)].map((_, i) => (
-                  <Card key={i}>
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
-                        {[...Array(3)].map((_, j) => (
-                          <div key={j} className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : serviceMetrics ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5" />
-                      Serviços Mais Utilizados
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {serviceMetrics.mostUsedServices.map((service, index) => (
-                        <div key={service.name} className="flex items-center gap-3">
-                          <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium">{service.name}</span>
-                              <span className="text-sm text-gray-600">{service.count}</span>
-                            </div>
-                            <Progress 
-                              value={(service.count / serviceMetrics.mostUsedServices[0].count) * 100} 
-                              className="h-1 mt-1" 
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Distribuição por Tipo</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="text-center mb-4">
-                        <div className="text-2xl font-bold">{serviceMetrics.totalServicesThisMonth}</div>
-                        <p className="text-sm text-gray-600">Serviços realizados este mês</p>
-                      </div>
-                      {serviceMetrics.servicesByType.map((type) => (
-                        <div key={type.type} className="flex justify-between items-center">
-                          <span className="text-sm">{type.type}</span>
-                          <div className="flex items-center gap-2">
-                            <Progress 
-                              value={(type.count / serviceMetrics.totalServicesThisMonth) * 100} 
-                              className="h-2 w-20" 
-                            />
-                            <span className="text-sm font-medium w-12">{type.count}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>Dados de serviços não disponíveis</p>
               </div>
             )}
           </TabsContent>
