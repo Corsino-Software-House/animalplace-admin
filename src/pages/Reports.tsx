@@ -128,7 +128,6 @@ export function Reports() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [respondMode, setRespondMode] = useState<'respond' | 'complete'>('respond');
 
-  // Modal handlers
   const handleViewReport = (report: Report) => {
     setSelectedReport(report);
     setIsViewModalOpen(true);
@@ -158,17 +157,16 @@ export function Reports() {
     setSelectedReport(null);
   };
 
-  // Real API calls using the reports service
   const { data: reportsData, isLoading: reportsLoading } = useQuery({
     queryKey: ['reports'],
-    queryFn: () => reportsService.getReports(1, 50), // Get more reports for better demo
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    queryFn: () => reportsService.getReports(1, 50),
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: statistics, isLoading: statsLoading } = useQuery({
     queryKey: ['report-statistics'],
     queryFn: () => reportsService.getStatistics(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
   const formatDate = (dateString: string) => {
@@ -190,7 +188,6 @@ export function Reports() {
     );
   }
 
-  // Handle case when no data is returned from API
   if (!reportsData || !statistics) {
     return (
       <div className="space-y-6">
@@ -215,7 +212,6 @@ export function Reports() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Relatórios dos Usuários</h1>
@@ -233,7 +229,6 @@ export function Reports() {
         </Button>
       </div>
 
-      {/* Statistics Overview */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="p-6">
@@ -292,9 +287,8 @@ export function Reports() {
         </div>
       )}
 
-      {/* Reports Management */}
       <Tabs defaultValue="all" className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <TabsList >
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="pending">Pendentes</TabsTrigger>
@@ -388,7 +382,6 @@ export function Reports() {
         </TabsContent>
 
         <TabsContent value="pending" className="space-y-4">
-          {/* Filter and show only pending reports */}
           {reportsData?.reports
             ?.filter(report => report.status === ReportStatus.PENDING)
             .map((report) => (
@@ -433,7 +426,6 @@ export function Reports() {
         </TabsContent>
 
         <TabsContent value="in-progress" className="space-y-4">
-          {/* Filter and show only in-progress reports */}
           {reportsData?.reports
             ?.filter(report => report.status === ReportStatus.IN_PROGRESS)
             .map((report) => (
@@ -478,7 +470,6 @@ export function Reports() {
         </TabsContent>
 
         <TabsContent value="resolved" className="space-y-4">
-          {/* Filter and show only resolved/closed reports */}
           {reportsData?.reports
             ?.filter(report => [ReportStatus.RESOLVED, ReportStatus.CLOSED].includes(report.status))
             .map((report) => (
@@ -532,20 +523,17 @@ export function Reports() {
         </TabsContent>
       </Tabs>
 
-      {/* Create Report Modal */}
       <CreateReportModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
       />
 
-      {/* View Report Modal */}
       <ViewReportModal
         isOpen={isViewModalOpen}
         onClose={closeAllModals}
         report={selectedReport}
       />
 
-      {/* Respond Report Modal */}
       <RespondReportModal
         isOpen={isRespondModalOpen}
         onClose={closeAllModals}
@@ -553,7 +541,6 @@ export function Reports() {
         mode={respondMode}
       />
 
-      {/* Delete Report Modal */}
       <DeleteReportModal
         isOpen={isDeleteModalOpen}
         onClose={closeAllModals}

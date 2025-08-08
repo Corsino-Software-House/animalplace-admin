@@ -23,7 +23,6 @@ export const REPORTS_MY_ROUTE = () => '/api/reports/my-reports';
 export const LOGIN_ROUTE = () => '/api/auth/login';
 export const LOGOUT_ROUTE = () => '/api/auth/logout';
 export const REFRESH_TOKEN_ROUTE = () => '/api/auth/refresh';
-// Removido AUTH_CHECK_ROUTE - não é mais necessário
 
 export const REGISTER_ROUTE = () => '/api/auth/register';
 

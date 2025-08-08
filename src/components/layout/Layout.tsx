@@ -16,7 +16,6 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex h-screen bg-white">
-      {/* Botão menu hambúrguer - visível apenas no mobile */}
       <div className="lg:hidden fixed top-4 left-4 z-60">
         <Button
           variant="outline"

@@ -68,7 +68,6 @@ export function RespondReportModal({ isOpen, onClose, report, mode }: RespondRep
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Report Details */}
             <div className="p-4 bg-gray-50 rounded-lg">
               <h4 className="font-semibold text-gray-900 mb-2">{report.title}</h4>
               <p className="text-gray-600 text-sm mb-2">{report.description}</p>
@@ -85,7 +84,6 @@ export function RespondReportModal({ isOpen, onClose, report, mode }: RespondRep
               </div>
             </div>
 
-            {/* Response Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="response">

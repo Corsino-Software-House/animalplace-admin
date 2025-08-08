@@ -10,7 +10,7 @@ export function usePlans() {
       const response = await getPlans();
       return Array.isArray(response) ? response : [];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -22,7 +22,7 @@ export function usePlanById(id: string, enabled: boolean = true) {
       return response;
     },
     enabled: enabled && !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 5 * 60 * 1000,
   });
 }
 

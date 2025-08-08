@@ -1,4 +1,3 @@
-// Enums
 export enum ServiceType {
   CONSULTATION = 'consultation',
   VACCINE = 'vaccine',
@@ -19,14 +18,12 @@ export enum ServiceCategory {
   VACCINE = 'vaccine',
 }
 
-// Reusable sub-type
 export interface ServiceLimit {
   limit: number;
   period: 'year' | 'month';
   carencyDays: number;
 }
 
-// DTO para criação de serviço (POST)
 export interface ServiceDto {
   name: string;
   description: string;
@@ -38,7 +35,6 @@ export interface ServiceDto {
   defaultLimits?: ServiceLimit;
 }
 
-// Retorno completo de serviço (GET)
 export interface Service extends ServiceDto {
   id: string;
   isActive: boolean;
@@ -46,7 +42,6 @@ export interface Service extends ServiceDto {
   updatedAt: string;
 }
 
-// Serviço com informações de assinatura
 export interface ServiceWithSubscriptionInfo extends Service {
   subscriptionInfo: {
     covered: boolean;
@@ -60,7 +55,6 @@ export interface ServiceWithSubscriptionInfo extends Service {
   };
 }
 
-// Registro de uso de serviço
 export interface ServiceUsage {
   id: string;
   service_id: string;

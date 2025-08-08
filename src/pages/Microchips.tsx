@@ -61,8 +61,7 @@ export function Microchips() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Gestão de Microchips</h1>
           <p className="text-gray-600 mt-2">Acompanhe e gerencie registros de microchips de pets</p>
@@ -70,12 +69,8 @@ export function Microchips() {
         <RegisterMicrochipModal />
       </div>
 
-      {/* Stats */}
-      {loadingStats ? (
-        <MicrochipStatsSkeleton />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
                 <Zap className="h-4 w-4" style={{ color: '#95CA3C' }} />
@@ -96,30 +91,26 @@ export function Microchips() {
               <p className="text-sm text-gray-600">Pets Microchipados</p>
             </CardContent>
           </Card>
-        </div>
-      )}
+      </div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar por número do chip, nome do pet ou proprietário..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Microchips Table */}
-      {loadingPets ? (
-        <MicrochipTableSkeleton />
-      ) : (
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
         <Card>
-          <CardHeader>
+          <CardContent className="pt-6">
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar por número do chip, nome do pet ou proprietário..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
             <CardTitle>Pets Microchipados ({filteredPets.length})</CardTitle>
           </CardHeader>
           <CardContent>
@@ -201,9 +192,8 @@ export function Microchips() {
             </Table>
           </CardContent>
         </Card>
-      )}
+      </div>
 
-      {/* Delete Confirmation Dialog */}
       <DeletePetDialog
         petName={deleteDialog.petName}
         isOpen={deleteDialog.isOpen}

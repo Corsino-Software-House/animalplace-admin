@@ -31,14 +31,13 @@ import { cashbackService } from '@/services/cashback-service';
 
 export function Cashbacks() {
   const [statusFilter, setStatusFilter] = useState('all');
-  const [currentPage] = useState(1); // Removido setCurrentPage por enquanto
+  const [currentPage] = useState(1);
   const queryClient = useQueryClient();
 
-  // API calls
   const { data: statistics, isLoading: statsLoading } = useQuery({
     queryKey: ['cashback-statistics'],
     queryFn: getCashbackStatistics,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: transactionsData, isLoading: transactionsLoading } = useQuery({
@@ -48,10 +47,9 @@ export function Cashbacks() {
       10,
       statusFilter === 'all' ? undefined : statusFilter
     ),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
   });
 
-  // Mutations
   const approveMutation = useMutation({
     mutationFn: cashbackService.approveTransaction,
     onSuccess: () => {
@@ -137,7 +135,6 @@ export function Cashbacks() {
           </div>
         </div>
         
-        {/* Loading skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <Card key={i}>
@@ -156,7 +153,6 @@ export function Cashbacks() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Gerenciamento de Cashback</h1>
@@ -164,7 +160,6 @@ export function Cashbacks() {
         </div>
       </div>
 
-      {/* Stats */}
       {statistics && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -204,7 +199,6 @@ export function Cashbacks() {
             </Card>
           </div>
 
-          {/* Additional Analytics */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
@@ -304,7 +298,6 @@ export function Cashbacks() {
         </>
       )}
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center space-x-4">
@@ -323,7 +316,6 @@ export function Cashbacks() {
         </CardContent>
       </Card>
 
-      {/* Transactions Table */}
       <Card>
         <CardHeader>
           <CardTitle>

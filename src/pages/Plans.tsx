@@ -18,7 +18,6 @@ import { EditPlanModal } from '@/components/plans/EditPlanModal';
 import { DeletePlanDialog } from '@/components/plans/DeletePlanDialog';
 import { PlanDetailsModal } from '@/components/plans/PlanDetailsModal';
 
-// Função para formatar preço
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -30,13 +29,9 @@ export function Plans() {
   const { data: plans = [], isLoading, error } = usePlans();
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Debounce do termo de pesquisa (300ms de delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   
-  // Indicador se está filtrando (para mostrar loading durante debounce)
   const isFiltering = searchTerm !== debouncedSearchTerm;
-
-  // Filtrar planos baseado no termo de pesquisa com debounce
   const filteredPlans = useMemo(() => {
     if (!plans || !debouncedSearchTerm.trim()) return plans;
 
@@ -48,7 +43,6 @@ export function Plans() {
     );
   }, [plans, debouncedSearchTerm]);
 
-  // Calcular estatísticas - usar planos filtrados
   const totalPlans = filteredPlans?.length || 0;
   const activePlans = filteredPlans?.filter(plan => plan.isActive).length || 0;
   const totalServices = filteredPlans?.reduce((acc, plan) => acc + (plan.serviceIds?.length || 0), 0) || 0;
@@ -68,52 +62,48 @@ export function Plans() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Gerenciamento de Planos</h1>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Crie e gerencie planos de assinatura para sua plataforma</p>
-          </div>
-          <div className="w-full sm:w-auto">
-            <CreatePlanModal />
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Gerenciamento de Planos</h1>
+          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Crie e gerencie planos de assinatura para sua plataforma</p>
+        </div>
+        <div className="w-full sm:w-auto">
+          <CreatePlanModal />
+        </div>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="relative max-w-md w-full sm:w-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Pesquisar planos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-10"
+          />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+            {isFiltering && searchTerm && (
+              <Loader2 className="h-4 w-4 text-gray-400 animate-spin mr-2" />
+            )}
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
-        
-        {/* Search Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative max-w-md w-full sm:w-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Pesquisar planos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-10"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-              {isFiltering && searchTerm && (
-                <Loader2 className="h-4 w-4 text-gray-400 animate-spin mr-2" />
-              )}
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
+        {debouncedSearchTerm && (
+          <div className="text-sm text-gray-600">
+            {totalPlans === 1 
+              ? `1 plano encontrado` 
+              : `${totalPlans} planos encontrados`
+            }
           </div>
-          {debouncedSearchTerm && (
-            <div className="text-sm text-gray-600">
-              {totalPlans === 1 
-                ? `1 plano encontrado` 
-                : `${totalPlans} planos encontrados`
-              }
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       {isLoading ? (
@@ -255,7 +245,6 @@ export function Plans() {
         </div>
       )}
 
-      {/* Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 sm:p-4 lg:pt-6">

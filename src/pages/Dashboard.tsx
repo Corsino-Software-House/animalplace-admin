@@ -51,7 +51,6 @@ export function Dashboard() {
     setLastUpdated(new Date());
   };
 
-  // Função para formatar valores monetários
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -59,7 +58,6 @@ export function Dashboard() {
     }).format(value);
   };
 
-  // Função para mapear ícones baseado no tipo
   const getActivityIcon = (iconType: string) => {
     switch (iconType) {
       case 'user':
@@ -75,7 +73,6 @@ export function Dashboard() {
     }
   };
 
-  // Função para determinar o tipo de mudança baseado no crescimento
   const getChangeType = (growth: string): 'positive' | 'negative' | 'neutral' => {
     if (growth.includes('+') && growth.includes('%')) return 'positive';
     if (growth.includes('-') && growth.includes('%')) return 'negative';
@@ -89,7 +86,6 @@ export function Dashboard() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
         </div>
-        {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {[...Array(4)].map((_, index) => (
             <Card key={index}>
@@ -104,9 +100,7 @@ export function Dashboard() {
             </Card>
           ))}
         </div>
-        {/* Content Grid Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Recent Activity Skeleton */}
           <Card>
             <CardHeader>
               <CardTitle>Atividades Recentes</CardTitle>
@@ -128,7 +122,6 @@ export function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          {/* Quick Actions Skeleton */}
           {/* <Card>
             <CardHeader>
               <CardTitle>Ações Rápidas</CardTitle>
@@ -180,13 +173,11 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6 lg:space-y-8">
-      {/* Header */}
       <div className="text-center lg:text-left">
         <h1 className="text-2xl lg:text-3xl font-bold">Dashboard</h1>
         <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatsCard
           title="Total de Usuários"
@@ -218,9 +209,7 @@ export function Dashboard() {
         />
       </div>
 
-      {/* Content Grid */}
       <div className="grid grid-cols-1 gap-4 lg:gap-6">
-        {/* Recent Activity - Largura completa */}
         <Card>
           <CardHeader>
             <CardTitle>Atividades Recentes</CardTitle>
@@ -228,19 +217,20 @@ export function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {isLoadingActivities ? (
-                // Skeleton loading para activities
-                [...Array(4)].map((_, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div>
-                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
-                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+                <div className="space-y-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div>
+                          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+                          <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
                       </div>
+                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
                     </div>
-                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : recentActivities.length > 0 ? (
                 recentActivities.map((activity, index) => (
                   <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
@@ -267,7 +257,6 @@ export function Dashboard() {
 
       </div>
 
-      {/* Analytics Detalhado - Integrado com APIs reais */}
       <div className="space-y-4 lg:space-y-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           <div>
@@ -292,7 +281,6 @@ export function Dashboard() {
           </TabsList>
 
 
-          {/* Subscriptions Tab */}
           <TabsContent value="subscriptions" className="space-y-4 lg:space-y-6">
             {isLoadingSubscriptions ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -404,7 +392,6 @@ export function Dashboard() {
             )}
           </TabsContent>
 
-          {/* Scheduling Tab */}
           <TabsContent value="scheduling" className="space-y-4 lg:space-y-6">
             {isLoadingScheduling ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">

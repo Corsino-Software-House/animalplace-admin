@@ -54,11 +54,9 @@ export function Agenda() {
   
   const { schedules, loading, error, fetchSchedules, reschedule, deleteSchedule } = useSchedule();
 
-  // Filtrar agendamentos
   const filteredSchedules = useMemo(() => {
     let filtered = schedules;
 
-    // Filtro por data
     if (dateFilter !== 'all') {
       filtered = filtered.filter((schedule) => {
         const scheduleDate = new Date(schedule.data_hora);
@@ -77,7 +75,6 @@ export function Agenda() {
       });
     }
 
-    // Filtro por status
     if (statusFilter !== 'all') {
       filtered = filtered.filter((schedule) => 
         schedule.status.toLowerCase() === statusFilter.toLowerCase()
@@ -87,7 +84,6 @@ export function Agenda() {
     return filtered;
   }, [schedules, dateFilter, statusFilter]);
 
-  // Estatísticas calculadas
   const stats = useMemo(() => {
     const todaySchedules = schedules.filter(s => isToday(new Date(s.data_hora)));
     
@@ -137,10 +133,8 @@ export function Agenda() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Agenda & Calendário</h1>
             <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Gerencie todos os agendamentos e serviços</p>
@@ -161,23 +155,16 @@ export function Agenda() {
               Novo Agendamento
             </Button> */}
           </div>
-        </div>
       </div>
 
-      {/* Error State */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-2 text-red-700">
-              <AlertCircle className="h-4 w-4" />
-              <p>{error}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="text-center py-12">
+          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <p>{error}</p>
+        </div>
       )}
 
-      {/* Estatísticas do Dia */}
-      <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 sm:p-4 lg:pt-6">
             <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
@@ -210,45 +197,34 @@ export function Agenda() {
         </Card>
       </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filtrar por data" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as Datas</SelectItem>
-                  <SelectItem value="today">Hoje</SelectItem>
-                  <SelectItem value="tomorrow">Amanhã</SelectItem>
-                  <SelectItem value="week">Esta Semana</SelectItem>
-                  <SelectItem value="month">Este Mês</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filtrar por status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os Status</SelectItem>
-                  <SelectItem value="confirmed">Confirmado</SelectItem>
-                  <SelectItem value="pending">Pendente</SelectItem>
-                  <SelectItem value="in-progress">Em Andamento</SelectItem>
-                  <SelectItem value="completed">Concluído</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="text-xs sm:text-sm text-gray-600">
-              Mostrando {filteredSchedules.length} de {schedules.length} agendamentos
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <Select value={dateFilter} onValueChange={setDateFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar por data" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas as Datas</SelectItem>
+            <SelectItem value="today">Hoje</SelectItem>
+            <SelectItem value="tomorrow">Amanhã</SelectItem>
+            <SelectItem value="week">Esta Semana</SelectItem>
+            <SelectItem value="month">Este Mês</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Status</SelectItem>
+            <SelectItem value="confirmed">Confirmado</SelectItem>
+            <SelectItem value="pending">Pendente</SelectItem>
+            <SelectItem value="in-progress">Em Andamento</SelectItem>
+            <SelectItem value="completed">Concluído</SelectItem>
+            <SelectItem value="cancelled">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      {/* Tabela de Agendamentos */}
       <Card>
         <CardHeader>
           <CardTitle>
@@ -278,7 +254,6 @@ export function Agenda() {
             </div>
           ) : (
             <>
-              {/* Mobile Cards View */}
               <div className="block md:hidden space-y-4">
                 {filteredSchedules.map((schedule) => {
                   const scheduleDate = new Date(schedule.data_hora);
@@ -286,7 +261,6 @@ export function Agenda() {
                     <Card key={schedule.id} className="border border-gray-200 hover:shadow-md transition-shadow">
                       <CardContent className="p-3 sm:p-4">
                         <div className="space-y-3">
-                          {/* Header com data/hora e status */}
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <Calendar className="h-4 w-4 text-gray-400" />
@@ -300,7 +274,6 @@ export function Agenda() {
                             </Badge>
                           </div>
                           
-                          {/* Cliente e Pet */}
                           <div className="grid grid-cols-1 gap-2">
                             <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-gray-400" />
@@ -320,7 +293,6 @@ export function Agenda() {
                             </div>
                           </div>
                           
-                          {/* Serviços */}
                           <div className="space-y-1">
                             <div className="text-xs text-gray-400 font-medium">Serviços:</div>
                             <div className="text-sm">
@@ -331,7 +303,6 @@ export function Agenda() {
                             </div>
                           </div>
                           
-                          {/* Observações */}
                           {schedule.observacoes && (
                             <div className="space-y-1">
                               <div className="text-xs text-gray-400 font-medium">Observações:</div>
@@ -341,7 +312,6 @@ export function Agenda() {
                             </div>
                           )}
                           
-                          {/* Ações */}
                           <div className="flex items-center justify-end pt-2 border-t">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -375,7 +345,6 @@ export function Agenda() {
                 })}
               </div>
 
-              {/* Tablet/Desktop Table View */}
               <div className="hidden md:block">
                 <div className="overflow-x-auto -mx-4 sm:mx-0">
                   <div className="inline-block min-w-full align-middle">
@@ -427,7 +396,6 @@ export function Agenda() {
                                   <div className="max-w-xs">
                                     <div className="font-medium text-sm truncate">{schedule.pet.nome}</div>
                                     <div className="text-xs text-gray-500 truncate">{schedule.pet.sexo} - {schedule.pet.raca}</div>
-                                    {/* Mostrar serviços em telas menores */}
                                     <div className="mt-1 lg:hidden">
                                       <div className="text-xs text-gray-600 truncate">
                                         {schedule.services.slice(0, 1).map(service => service.name).join(', ')}
@@ -496,7 +464,6 @@ export function Agenda() {
         </CardContent>
       </Card>
 
-      {/* Modals */}
       <RescheduleModal
         schedule={selectedSchedule}
         open={rescheduleModalOpen}

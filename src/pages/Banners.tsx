@@ -120,7 +120,6 @@ export function Banners() {
       setSelectedFile(file);
       setFormData({ ...formData, image: file });
       
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target?.result as string);
@@ -135,7 +134,6 @@ export function Banners() {
     setExistingImageUrl('');
     setFormData({ ...formData, image: undefined });
     
-    // Reset file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -232,8 +230,7 @@ export function Banners() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Banners</h1>
           <p className="text-gray-600 mt-2">Gerencie banners promocionais exibidos no aplicativo</p>
@@ -368,7 +365,6 @@ export function Banners() {
         </div>
       </div>
 
-      {/* Banners Grid */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
