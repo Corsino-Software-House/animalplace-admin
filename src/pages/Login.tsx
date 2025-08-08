@@ -12,7 +12,6 @@ export default function Login() {
   const navigate = useNavigate();
   const loginMutation = useLogin();
 
-  // Login form state
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -25,13 +24,11 @@ export default function Login() {
     try {
       await loginMutation.mutateAsync(loginData);
       
-      // Aguardar um momento para garantir que a autenticação foi processada
       setTimeout(() => {
         navigate('/dashboard');
       }, 100);
       
     } catch {
-      // Erro já tratado no hook
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +37,6 @@ export default function Login() {
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto font-space-grotesk">
-        {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <Paw className="h-12 w-12" style={{ color: '#95CA3C' }} />
@@ -49,7 +45,6 @@ export default function Login() {
           <p className="text-gray-600">Admin Dashboard</p>
         </div>
 
-        {/* Login Card */}
         <Card className="border w-full border-gray-200 shadow-sm">
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl font-semibold text-center">
@@ -107,7 +102,6 @@ export default function Login() {
               </Button>
             </form>
 
-            {/* Link to register */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Não tem uma conta?{' '}

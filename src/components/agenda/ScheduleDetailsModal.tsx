@@ -71,7 +71,6 @@ export function ScheduleDetailsModal({
         </DialogHeader>
 
         <div className="space-y-4 sm:space-y-6">
-          {/* Status e Data/Hora */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
@@ -86,7 +85,6 @@ export function ScheduleDetailsModal({
 
           <Separator />
 
-          {/* Informações do Cliente */}
           <Card>
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -108,7 +106,6 @@ export function ScheduleDetailsModal({
             </CardContent>
           </Card>
 
-          {/* Informações do Pet */}
           <Card>
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -138,7 +135,6 @@ export function ScheduleDetailsModal({
             </CardContent>
           </Card>
 
-          {/* Serviços */}
           <Card>
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -174,7 +170,6 @@ export function ScheduleDetailsModal({
             </CardContent>
           </Card>
 
-          {/* Observações */}
           {schedule.observacoes && (
             <Card>
               <CardContent className="p-3 sm:p-4">

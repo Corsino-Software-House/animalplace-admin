@@ -10,7 +10,7 @@ export function useServices() {
       const response = await getServices();
       return response.data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -97,6 +97,6 @@ export function useServiceById(id: string, enabled: boolean = true) {
       return response.data;
     },
     enabled: enabled && !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 5 * 60 * 1000,
   });
 }

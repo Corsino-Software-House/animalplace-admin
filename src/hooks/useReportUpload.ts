@@ -28,7 +28,6 @@ export const useReportUpload = () => {
       const xhr = new XMLHttpRequest();
       const token = localStorage.getItem('auth_token');
 
-      // Upload progress
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
           const percentComplete = Math.round((event.loaded / event.total) * 100);
@@ -39,7 +38,6 @@ export const useReportUpload = () => {
         }
       });
 
-      // Request complete
       xhr.addEventListener('load', () => {
         setIsUploading(false);
         
@@ -53,7 +51,6 @@ export const useReportUpload = () => {
               result,
             });
             
-            // Invalidate queries to refresh data
             queryClient.invalidateQueries({ queryKey: ['reports'] });
             queryClient.invalidateQueries({ queryKey: ['report-statistics'] });
             
@@ -77,7 +74,6 @@ export const useReportUpload = () => {
             const errorResponse = JSON.parse(xhr.responseText);
             errorMessage = errorResponse.message || errorMessage;
           } catch {
-            // Keep default error message
           }
           
           setUploadProgress({
@@ -91,7 +87,6 @@ export const useReportUpload = () => {
         }
       });
 
-      // Request error
       xhr.addEventListener('error', () => {
         setIsUploading(false);
         setUploadProgress({
@@ -103,7 +98,6 @@ export const useReportUpload = () => {
         reject(new Error('Erro de conexão com o servidor'));
       });
 
-      // Request timeout
       xhr.addEventListener('timeout', () => {
         setIsUploading(false);
         setUploadProgress({
@@ -117,7 +111,7 @@ export const useReportUpload = () => {
 
       xhr.open('POST', `${import.meta.env.VITE_API_URL}/reports`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      xhr.timeout = 5 * 60 * 1000; // 5 minutes timeout
+      xhr.timeout = 5 * 60 * 1000;
       
       xhr.send(formData);
     });

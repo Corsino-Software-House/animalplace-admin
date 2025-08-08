@@ -13,13 +13,12 @@ import { Services } from '@/pages/Services';
 import { Agenda } from '@/pages/Agenda';
 import { Microchips } from '@/pages/Microchips';
 import { Cashbacks } from '@/pages/Cashbacks';
-// import { Reports } from '@/pages/Reports';
+
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import './App.css';
 
-// Criar instância do QueryClient
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -35,12 +34,10 @@ function App() {
       <Router>
         <div className="min-h-screen bg-white text-black">
           <Routes>
-            {/* Rotas públicas */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             
-            {/* Rotas protegidas */}
             <Route
               path="/"
               element={

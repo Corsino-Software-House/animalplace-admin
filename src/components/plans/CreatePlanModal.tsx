@@ -34,7 +34,6 @@ const serviceTypeLabels = {
   bath_and_grooming: 'Banho e Tosa',
 };
 
-// Função para traduzir categorias de serviço
 const getCategoryLabel = (category: string) => {
   const categoryLabels: Record<string, string> = {
     clinical: 'Clínico',
@@ -64,7 +63,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   
-  // Buscar serviços da API
   const { data: services = [], isLoading: servicesLoading } = useServices();
   
   const [formData, setFormData] = useState<Omit<Plan, 'id'>>({
@@ -153,7 +151,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
     }));
   };
 
-  // Agrupar serviços por categoria
   const servicesByCategory = groupServicesByCategory(services);
 
   const defaultTrigger = (
@@ -164,8 +161,8 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
   );
 
   const canProceedToStep2 = formData.name && formData.description && formData.suggestedPrice > 0;
-  const canProceedToStep3 = true; // Service limits sempre podem prosseguir
-  const canProceedToStep4 = true; // Services sempre podem prosseguir
+  const canProceedToStep3 = true;
+  const canProceedToStep4 = true;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -190,7 +187,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
         </DialogHeader>
 
         <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
-          {/* Etapa 1: Informações Básicas */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold">Informações Básicas</h3>
@@ -270,7 +266,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
             </div>
           )}
 
-          {/* Etapa 2: Limites de Serviços */}
           {currentStep === 2 && (
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold">Limites de Serviços</h3>
@@ -342,7 +337,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
             </div>
           )}
 
-          {/* Etapa 3: Seleção de Serviços */}
           {currentStep === 3 && (
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold">Seleção de Serviços</h3>
@@ -473,7 +467,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
             </div>
           )}
 
-          {/* Etapa 4: Regras Especiais */}
           {currentStep === 4 && (
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold">Regras Especiais</h3>
@@ -525,7 +518,6 @@ export function CreatePlanModal({ trigger }: CreatePlanModalProps) {
           )}
         </div>
 
-        {/* Navigation */}
         <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 pt-3 sm:pt-4 border-t">
           <Button
             type="button"

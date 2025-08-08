@@ -33,7 +33,6 @@ const periodLabels = {
   year: 'Ano',
 };
 
-// Função para formatar preço
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -91,7 +90,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
           </div>
         ) : plan ? (
           <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
-            {/* Header com status */}
             <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div
@@ -108,7 +106,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             </div>
 
-            {/* Informações básicas */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               <Card>
                 <CardContent className="p-3 sm:p-4">
@@ -138,7 +135,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </Card>
             </div>
 
-            {/* Descrição */}
             <div className="space-y-2">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Descrição</h4>
               <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
@@ -146,7 +142,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </p>
             </div>
 
-            {/* Limites de Serviços */}
             <div className="space-y-3 sm:space-y-4">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Limites de Serviços</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
@@ -166,7 +161,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             </div>
 
-            {/* Serviços Incluídos no Plano */}
             {plan.serviceIds && plan.serviceIds.length > 0 && (
               <div className="space-y-3 sm:space-y-4">
                 <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Incluídos no Plano ({plan.serviceIds.length})</h4>
@@ -210,7 +204,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             )}
 
-            {/* Serviços Gratuitos */}
             {plan.freeServices && plan.freeServices.length > 0 && (
               <div className="space-y-3 sm:space-y-4">
                 <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Gratuitos ({plan.freeServices.length})</h4>
@@ -249,7 +242,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             )}
 
-            {/* Serviços para Compra no App */}
             {plan.appPurchaseServices && plan.appPurchaseServices.length > 0 && (
               <div className="space-y-3 sm:space-y-4">
                 <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços para Compra no App ({plan.appPurchaseServices.length})</h4>
@@ -288,7 +280,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             )}
 
-            {/* Regras Especiais */}
             <div className="space-y-3 sm:space-y-4">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Regras Especiais</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -303,7 +294,6 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             </div>
 
-            {/* Ações */}
             <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t">
               <EditPlanModal 
                 plan={plan}

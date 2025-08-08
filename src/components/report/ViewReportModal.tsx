@@ -80,7 +80,6 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {/* Header with badges */}
             <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
               <Badge className={statusColors[report.status]}>
                 {statusLabels[report.status]}
@@ -93,7 +92,6 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
               </Badge>
             </div>
 
-            {/* Title and Description */}
             <div>
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 break-words">
                 {report.title}
@@ -103,7 +101,6 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
               </p>
             </div>
 
-            {/* User Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-2">
                 <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
@@ -162,7 +159,6 @@ export function ViewReportModal({ isOpen, onClose, report }: ViewReportModalProp
               )}
             </div>
 
-            {/* Response */}
             {report.adminResponse && (
               <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
                 <h4 className="font-medium text-blue-900 mb-2">Resposta da Equipe</h4>

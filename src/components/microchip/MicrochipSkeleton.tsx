@@ -16,7 +16,6 @@ export function MicrochipStatsSkeleton() {
         <Card key={index}>
           <CardContent className="pt-6">
             {index === 3 ? (
-              // Card especial para "Este Mês" com indicador de crescimento
               <div>
                 <Skeleton className="h-8 w-16 mb-2" />
                 <div className="flex items-center justify-between">
@@ -25,7 +24,6 @@ export function MicrochipStatsSkeleton() {
                 </div>
               </div>
             ) : index === 0 ? (
-              // Card especial para "Total de Pets" com ícone
               <div className="flex items-center space-x-2">
                 <Skeleton className="h-4 w-4" />
                 <div className="space-y-2">
@@ -34,7 +32,6 @@ export function MicrochipStatsSkeleton() {
                 </div>
               </div>
             ) : (
-              // Cards padrão
               <div className="space-y-2">
                 <Skeleton className="h-8 w-16" />
                 <Skeleton className="h-4 w-24" />

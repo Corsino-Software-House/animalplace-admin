@@ -38,7 +38,6 @@ export function Users() {
     queryFn: getUsers,
   });
 
-  // Garantir que users é sempre um array
   const safeUsers = users || [];
 
   const filteredUsers = safeUsers.filter(user =>
@@ -260,7 +259,6 @@ export function Users() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Usuários</h1>
@@ -279,7 +277,6 @@ export function Users() {
         </div>
       </div>
 
-      {/* Search */}
       <Card>
         <CardContent className="pt-6">
           <div className="relative max-w-md">
@@ -292,10 +289,9 @@ export function Users() {
             />
           </div>
         </CardContent>
-      </Card>
+              </Card>
 
-      {/* Users List */}
-      <Card>
+        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UsersIcon className="h-5 w-5" />
@@ -367,7 +363,6 @@ export function Users() {
                     <CollapsibleContent>
                       <div className="px-3 lg:px-4 pb-4 border-t border-gray-200 bg-gray-50">
                         <div className="pt-4">
-                          {/* Status mobile - apenas visível em mobile */}
                           <div className="sm:hidden mb-4 flex justify-center">
                             <div className="flex items-center gap-1">
                               {user.status === 'Administrador' && <Crown className="h-3 w-3 text-yellow-500" />}

@@ -52,7 +52,6 @@ export default function Register() {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...submitData } = registerData;
       await registerMutation.mutateAsync(submitData);
       
@@ -61,7 +60,6 @@ export default function Register() {
         description: "Enviamos um código de verificação para seu email.",
       });
       
-      // Redireciona para a página de verificação com o email
       navigate('/verify-email', { 
         state: { email: registerData.email },
         replace: true 

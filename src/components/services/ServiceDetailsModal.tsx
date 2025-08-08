@@ -15,7 +15,6 @@ interface ServiceDetailsModalProps {
   trigger?: React.ReactNode;
 }
 
-// Função para traduzir categorias
 const getCategoryLabel = (category: ServiceCategory) => {
   const labels = {
     [ServiceCategory.CLINICAL]: 'Clínico',
@@ -27,7 +26,6 @@ const getCategoryLabel = (category: ServiceCategory) => {
   return labels[category] || category;
 };
 
-// Função para traduzir tipos
 const getTypeLabel = (type: ServiceType) => {
   const labels = {
     [ServiceType.CONSULTATION]: 'Consulta',
@@ -43,7 +41,6 @@ const getTypeLabel = (type: ServiceType) => {
   return labels[type] || type;
 };
 
-// Função para formatar preço
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -51,7 +48,6 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
-// Função para formatar duração
 const formatDuration = (duration: number) => {
   if (duration >= 60) {
     const hours = Math.floor(duration / 60);
@@ -61,7 +57,6 @@ const formatDuration = (duration: number) => {
   return `${duration}min`;
 };
 
-// Função para formatar data
 const formatDate = (dateString: string) => {
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
@@ -121,8 +116,7 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
           </div>
         ) : service ? (
           <div className="space-y-6">
-            {/* Status Badge */}
-            <div className="flex justify-between items-start">
+            <div className="flex items-start justify-between gap-4">
               <Badge 
                 variant={service.isActive ? 'default' : 'secondary'}
                 style={service.isActive ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
@@ -132,7 +126,6 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </Badge>
             </div>
 
-            {/* Descrição */}
             <div className="space-y-2">
               <h4 className="font-medium text-gray-900">Descrição</h4>
               <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
@@ -140,7 +133,6 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </p>
             </div>
 
-            {/* Informações Principais */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="p-4">
@@ -189,7 +181,6 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </Card>
             </div>
 
-            {/* Limites Padrão */}
             {service.defaultLimits && (
               <div className="space-y-3">
                 <h4 className="font-medium text-gray-900">Limites Padrão</h4>
@@ -212,7 +203,6 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </div>
             )}
 
-            {/* Datas */}
             <div className="space-y-3 border-t pt-4">
               <h4 className="font-medium text-gray-900">Informações do Sistema</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -227,7 +217,6 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </div>
             </div>
 
-            {/* Ações */}
             <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
               <EditServiceModal 
                 service={service}

@@ -89,7 +89,7 @@ export const registerMicrochip = async (data: RegisterMicrochipRequest) => {
     microchip_number: data.microchipData.microchip_number,
     microchip_manufacturer: data.microchipData.microchip_manufacturer,
     microchip_location: data.microchipData.microchip_location,
-    microchip_implantation_date: new Date().toISOString().split('T')[0] // Data atual
+    microchip_implantation_date: new Date().toISOString().split('T')[0]
   });
   return response.data;
 };

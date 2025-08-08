@@ -28,7 +28,6 @@ export function Payments() {
     queryFn: () => getPaymentsList(currentPage, pageSize),
   });
 
-  // Função para formatar valor monetário
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -36,12 +35,10 @@ export function Payments() {
     }).format(value);
   };
 
-  // Função para formatar data
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
-  // Função para traduzir status
   const translateStatus = (status: string): string => {
     const statusMap: { [key: string]: string } = {
       'pendente': 'pendente',
@@ -52,7 +49,6 @@ export function Payments() {
     return statusMap[status] || status;
   };
 
-  // Função para traduzir método de pagamento
   const translatePaymentMethod = (method: string): string => {
     const methodMap: { [key: string]: string } = {
       'CREDIT_CARD': 'Cartão de Crédito',
@@ -88,62 +84,50 @@ export function Payments() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Pagamentos</h1>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Acompanhe todas as transações e sincronização de pagamentos</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Pagamentos</h1>
+          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Acompanhe todas as transações e sincronização de pagamentos</p>
         </div>
       </div>
 
-      {/* Tabs para organizar conteúdo */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="payments">💳 Pagamentos</TabsTrigger>
-          <TabsTrigger value="sync">🔄 Sincronização</TabsTrigger>
+          <TabsTrigger value="payments">Pagamentos</TabsTrigger>
+          <TabsTrigger value="sync">Sincronização</TabsTrigger>
         </TabsList>
 
-        {/* Tab de Pagamentos */}
-        <TabsContent value="payments" className="space-y-4">
-          {/* Filters */}
-          <Card>
-            <CardContent className="p-3 sm:p-4 lg:pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Pesquisar pagamentos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Filtrar por status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os Status</SelectItem>
-                    <SelectItem value="completed">Concluído</SelectItem>
-                    <SelectItem value="pending">Pendente</SelectItem>
-                    <SelectItem value="failed">Falhou</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="payments" className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Pesquisar pagamentos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Filtrar por status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="completed">Concluído</SelectItem>
+                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="failed">Falhou</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Payments Table */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">Histórico de Transações ({filteredPayments.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
               {isLoadingPayments ? (
-                // Skeleton para tabela
                 <div className="space-y-4">
                   {[...Array(5)].map((_, index) => (
                     <div key={index} className="flex items-center space-x-4 py-4 border-b">
@@ -164,7 +148,6 @@ export function Payments() {
                       <Card key={payment.id} className="border border-gray-200 hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="space-y-4">
-                            {/* Header com ID e status */}
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex items-center gap-2">
                                 <CreditCard className="h-5 w-5 text-gray-400" />
@@ -186,7 +169,6 @@ export function Payments() {
                               </Badge>
                             </div>
                             
-                            {/* Usuário */}
                             <div className="flex items-start gap-3">
                               <User className="h-5 w-5 text-gray-400 mt-0.5" />
                               <div className="min-w-0 flex-1">
@@ -195,7 +177,6 @@ export function Payments() {
                               </div>
                             </div>
                             
-                            {/* Valor */}
                             <div className="flex items-center gap-3">
                               <DollarSign className="h-5 w-5 text-gray-400" />
                               <div>
@@ -204,7 +185,6 @@ export function Payments() {
                               </div>
                             </div>
                             
-                            {/* Plano e Método */}
                             <div className="space-y-2">
                               <div className="text-xs text-gray-400 font-medium">Detalhes:</div>
                               <div className="flex flex-wrap gap-2">
@@ -235,8 +215,7 @@ export function Payments() {
           </Card>
         </TabsContent>
 
-        {/* Tab de Sincronização */}
-        <TabsContent value="sync" className="space-y-4">
+        <TabsContent value="sync" className="space-y-6">
           <PaymentSyncPanel />
         </TabsContent>
       </Tabs>

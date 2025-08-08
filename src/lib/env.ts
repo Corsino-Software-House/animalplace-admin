@@ -17,7 +17,6 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).optional().default('development'),
 });
 
-// Validação das variáveis de ambiente
 const validateEnv = () => {
   const envVars = {
     BASE_URL_API: import.meta.env.VITE_BASE_URL_API || process.env.VITE_BASE_URL_API || process.env.BASE_URL_API,
@@ -34,7 +33,6 @@ const validateEnv = () => {
       });
       console.error('\n💡 Certifique-se de que o arquivo .env.local existe e contém:');
 
-      // Em desenvolvimento, podemos usar valores padrão
       if (envVars.NODE_ENV === 'development') {
         console.warn('\nUsando valores padrão para desenvolvimento...');
         return {

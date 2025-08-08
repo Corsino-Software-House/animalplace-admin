@@ -23,7 +23,6 @@ export default function VerifyEmail() {
   const resendMutation = useResendVerification();
 
   useEffect(() => {
-    // Pega o email dos parâmetros da URL ou do estado de navegação
     const urlParams = new URLSearchParams(location.search);
     const emailFromUrl = urlParams.get('email');
     const emailFromState = location.state?.email;
@@ -33,11 +32,8 @@ export default function VerifyEmail() {
     if (userEmail) {
       setEmail(userEmail);
     } else {
-      // Se não tem email, redireciona para o registro
       navigate('/register');
     }
-
-    // Inicia countdown para reenvio
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -74,7 +70,6 @@ export default function VerifyEmail() {
         description: "Você será redirecionado para o dashboard.",
       });
       
-      // Redireciona para o dashboard após verificação bem-sucedida
       setTimeout(() => {
         navigate('/', { replace: true });
       }, 2000);
@@ -92,7 +87,6 @@ export default function VerifyEmail() {
     try {
       await resendMutation.mutateAsync({ email });
       
-      // Reinicia o countdown
       setCanResend(false);
       setCountdown(60);
       
@@ -113,9 +107,7 @@ export default function VerifyEmail() {
   };
 
   const formatCode = (value: string) => {
-    // Remove tudo que não é número
     const digits = value.replace(/\D/g, '');
-    // Limita a 6 dígitos
     return digits.slice(0, 6);
   };
 

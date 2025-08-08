@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Plus, Loader2 } from 'lucide-react';
 import { registerMicrochip, RegisterMicrochipRequest, getNotMicrochippedPets } from '@/services/microchip.service';
-// import { usePets } from '@/hooks/useMicrochip';
+
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 

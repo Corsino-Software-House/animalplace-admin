@@ -121,26 +121,21 @@ export const useLogout = () => {
   };
 };
 
-// Função para limpar dados de autenticação
 export const clearAuth = () => {
   localStorage.removeItem('animalplace_token');
   localStorage.removeItem('animalplace_user');
 };
 
-// Função para verificar se o token está válido (formato básico)
 const isTokenValid = (token: string | null): boolean => {
   if (!token) return false;
   
   try {
-    // Verificar se o token tem o formato JWT básico (3 partes separadas por ponto)
     const parts = token.split('.');
     if (parts.length !== 3) return false;
     
-    // Decodificar o payload para verificar expiração
     const payload = JSON.parse(atob(parts[1]));
     const now = Math.floor(Date.now() / 1000);
     
-    // Se tem campo de expiração, verificar se não expirou
     if (payload.exp && payload.exp < now) {
       clearAuth();
       return false;
@@ -148,7 +143,6 @@ const isTokenValid = (token: string | null): boolean => {
     
     return true;
   } catch {
-    // Se não conseguir decodificar, considerar inválido
     clearAuth();
     return false;
   }
@@ -159,10 +153,8 @@ export const useAuth = () => {
   const userString = localStorage.getItem('animalplace_user');
   const user = userString ? JSON.parse(userString) : null;
 
-  // Verificar se o token é válido
   const isValidToken = isTokenValid(token);
   
-  // Se o token não for válido, limpar dados
   if (token && !isValidToken) {
     clearAuth();
   }

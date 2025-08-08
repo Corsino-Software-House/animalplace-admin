@@ -28,7 +28,6 @@ import { ServiceDetailsModal } from '@/components/services/ServiceDetailsModal';
 import { ServiceType, ServiceCategory } from '@/types/services';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Função para traduzir categorias
 const getCategoryLabel = (category: ServiceCategory) => {
   const labels = {
     [ServiceCategory.CLINICAL]: 'Clínico',
@@ -40,7 +39,6 @@ const getCategoryLabel = (category: ServiceCategory) => {
   return labels[category] || category;
 };
 
-// Função para traduzir tipos
 const getTypeLabel = (type: ServiceType) => {
   const labels = {
     [ServiceType.CONSULTATION]: 'Consulta',
@@ -56,7 +54,6 @@ const getTypeLabel = (type: ServiceType) => {
   return labels[type] || type;
 };
 
-// Função para formatar preço
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -64,7 +61,6 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
-// Função para formatar duração
 const formatDuration = (duration: number) => {
   if (duration >= 60) {
     const hours = Math.floor(duration / 60);
@@ -81,24 +77,18 @@ export function Services() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
-  // Debounce do termo de pesquisa (300ms de delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   
-  // Indicador se está filtrando (para mostrar loading durante debounce)
   const isFiltering = searchTerm !== debouncedSearchTerm;
-
-  // Filtrar serviços baseado no termo de pesquisa e categoria
   const filteredServices = useMemo(() => {
     if (!services) return [];
 
     let filtered = services;
 
-    // Filtrar por categoria
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(service => service.category === selectedCategory);
     }
 
-    // Filtrar por termo de pesquisa
     if (debouncedSearchTerm.trim()) {
       const term = debouncedSearchTerm.toLowerCase().trim();
       filtered = filtered.filter(service => 
@@ -112,35 +102,29 @@ export function Services() {
     return filtered;
   }, [services, debouncedSearchTerm, selectedCategory]);
 
-  // Calcular paginação
   const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
   const paginatedServices = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredServices.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredServices, currentPage, itemsPerPage]);
 
-  // Reset página quando filtros mudarem
   const resetPage = () => setCurrentPage(1);
 
-  // Calcular estatísticas - usar serviços filtrados
   const totalServices = filteredServices.length;
   const activeServices = filteredServices.filter(service => service.isActive).length;
   const categories = filteredServices ? new Set(filteredServices.map(service => service.category)).size : 0;
 
-  // Obter lista de categorias disponíveis
   const availableCategories = useMemo(() => {
     if (!services) return [];
     const categoriesSet = new Set(services.map(service => service.category));
     return Array.from(categoriesSet).sort();
   }, [services]);
 
-  // Handler para mudança de categoria
   const handleCategoryChange = (category: ServiceCategory | 'all') => {
     setSelectedCategory(category);
     resetPage();
   };
 
-  // Handler para mudança de pesquisa
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     resetPage();
@@ -162,7 +146,6 @@ export function Services() {
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -174,7 +157,6 @@ export function Services() {
           </div>
         </div>
         
-        {/* Search Bar */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="relative max-w-md w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -199,7 +181,6 @@ export function Services() {
             </div>
           </div>
           
-          {/* Category Filter */}
           <div className="flex items-center gap-2 min-w-[200px]">
             <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <Select value={selectedCategory} onValueChange={handleCategoryChange}>
@@ -228,7 +209,6 @@ export function Services() {
         </div>
       </div>
 
-      {/* Service Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 sm:p-4 lg:pt-6">
@@ -268,7 +248,6 @@ export function Services() {
         </Card>
       </div>
 
-      {/* Services Table/Cards */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg sm:text-xl">Todos os Serviços</CardTitle>
@@ -308,7 +287,6 @@ export function Services() {
             </div>
           ) : (
             <>
-              {/* Mobile Cards View */}
               <div className="block md:hidden space-y-4">
                 {paginatedServices.map((service) => (
                   <ServiceDetailsModal
@@ -318,7 +296,6 @@ export function Services() {
                       <Card className="border border-gray-200 cursor-pointer hover:shadow-md transition-shadow">
                         <CardContent className="p-3 sm:p-4">
                           <div className="space-y-3">
-                            {/* Header com nome e status */}
                             <div className="flex items-start justify-between gap-2">
                               <h3 className="font-medium text-sm sm:text-base line-clamp-2 flex-1">
                                 {service.name}
@@ -332,12 +309,10 @@ export function Services() {
                               </Badge>
                             </div>
                             
-                            {/* Descrição */}
                             <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
                               {service.description}
                             </p>
                             
-                            {/* Badges de tipo e categoria */}
                             <div className="flex flex-wrap gap-1">
                               <Badge variant="outline" className="text-xs">
                                 {getTypeLabel(service.type)}
@@ -347,7 +322,6 @@ export function Services() {
                               </Badge>
                             </div>
                             
-                            {/* Informações principais */}
                             <div className="flex items-center justify-between">
                               <div className="flex flex-col sm:flex-row sm:gap-4 gap-1">
                                 <div className="flex items-center gap-1">
@@ -400,7 +374,6 @@ export function Services() {
                 ))}
               </div>
 
-              {/* Tablet/Desktop Table View */}
               <div className="hidden md:block">
                 <div className="overflow-x-auto -mx-4 sm:mx-0">
                   <div className="inline-block min-w-full align-middle">
@@ -443,7 +416,6 @@ export function Services() {
                                 <div className="text-sm text-gray-500 truncate md:line-clamp-1">
                                   {service.description}
                                 </div>
-                                {/* Mostrar tipo e categoria em telas menores */}
                                 <div className="mt-1 flex flex-wrap gap-1 xl:hidden">
                                   <Badge variant="outline" className="text-xs">
                                     {getTypeLabel(service.type)}
@@ -544,7 +516,6 @@ export function Services() {
             </>
           )}
           
-          {/* Pagination Controls */}
           {filteredServices.length > 0 && totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
               <div className="text-sm text-gray-600 order-2 sm:order-1">

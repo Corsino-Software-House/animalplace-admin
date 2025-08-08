@@ -8,9 +8,7 @@ import { AlertCircle, CheckCircle, DollarSign, RefreshCw, Activity } from 'lucid
 import { usePaymentDiagnosis, usePaymentStats } from '@/hooks/usePaymentSync';
 
 export function PaymentSyncPanel() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [diagnosisResult, setDiagnosisResult] = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [statsResult, setStatsResult] = useState<any>(null);
   
   const diagnosisMutation = usePaymentDiagnosis();
@@ -21,7 +19,6 @@ export function PaymentSyncPanel() {
       const result = await diagnosisMutation.mutateAsync();
       setDiagnosisResult(result);
       
-      // Atualizar stats após diagnóstico
       const stats = await statsMutation.mutateAsync();
       setStatsResult(stats);
     } catch (error) {
@@ -40,7 +37,6 @@ export function PaymentSyncPanel() {
 
   return (
     <div className="space-y-6">
-      {/* Estatísticas atuais */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -95,7 +91,6 @@ export function PaymentSyncPanel() {
         </CardContent>
       </Card>
 
-      {/* Painel de diagnóstico */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -121,7 +116,6 @@ export function PaymentSyncPanel() {
               <div className="space-y-4">
                 <Separator />
                 
-                {/* Resumo */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   <Badge variant="outline" className="justify-center p-2">
                     {diagnosisResult.paymentsFound} Pagamentos
@@ -137,7 +131,6 @@ export function PaymentSyncPanel() {
                   </Badge>
                 </div>
 
-                {/* Diagnóstico */}
                 <div>
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
                     <AlertCircle className="h-4 w-4" />
@@ -154,7 +147,6 @@ export function PaymentSyncPanel() {
                   </ScrollArea>
                 </div>
 
-                {/* Correções */}
                 {diagnosisResult.fixes.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -178,7 +170,6 @@ export function PaymentSyncPanel() {
         </CardContent>
       </Card>
 
-      {/* Informações sobre sincronização automática */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">ℹ️ Sincronização Automática</CardTitle>

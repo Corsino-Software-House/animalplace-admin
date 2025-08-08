@@ -46,10 +46,9 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     
-    // Validate file types
     const validFiles = files.filter(file => {
       const isValidType = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'].includes(file.type);
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+      const isValidSize = file.size <= 10 * 1024 * 1024;
       return isValidType && isValidSize;
     });
 
@@ -57,7 +56,7 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
       alert('Alguns arquivos foram removidos por não atenderem aos critérios (apenas JPG, PNG, GIF, PDF até 10MB)');
     }
 
-    setSelectedFiles(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
+    setSelectedFiles(prev => [...prev, ...validFiles].slice(0, 5));
   };
 
   const removeFile = (index: number) => {
@@ -92,7 +91,6 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
       formData.append('contactPhone', contactPhone.trim());
     }
 
-    // Add files
     selectedFiles.forEach((file) => {
       formData.append('attachments', file);
     });
@@ -193,7 +191,6 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
               </div>
             </div>
 
-            {/* File Upload Section */}
             <div>
               <Label>Anexos (até 5 imagens/PDFs)</Label>
               <div className="space-y-2">
@@ -222,7 +219,6 @@ export function CreateReportModal({ isOpen, onClose }: CreateReportModalProps) {
                   className="hidden"
                 />
 
-                {/* Selected Files List */}
                 {selectedFiles.length > 0 && (
                   <div className="space-y-2 border rounded-lg p-3">
                     <h4 className="text-sm font-medium">Arquivos Selecionados:</h4>
