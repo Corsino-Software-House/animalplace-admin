@@ -18,12 +18,11 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Search, MoreHorizontal, Edit, Zap, Trash2 } from 'lucide-react';
-import { useMicrochipStats, useMicrochippedPets, useDeleteMicrochippedPet } from '@/hooks/useMicrochip';
+import { useMicrochipStats, useMicrochippedPets, useDeleteMicrochippedPet, useMicrochipLoading } from '@/hooks/useMicrochip';
 import { RegisterMicrochipModal } from '@/components/microchip/RegisterMicrochipModal';
 import { EditPetModal } from '@/components/microchip/EditPetModal';
 import { DeletePetDialog } from '@/components/microchip/DeletePetDialog';
 import { MicrochippedPet } from '@/services/microchip.service';
-import { MicrochipStatsSkeleton, MicrochipTableSkeleton } from '@/components/microchip/MicrochipSkeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -35,9 +34,10 @@ export function Microchips() {
     petName: ''
   });
   
-  const { data: stats, isLoading: loadingStats } = useMicrochipStats();
-  const { data: microchippedPets = [], isLoading: loadingPets } = useMicrochippedPets();
+  const { data: stats } = useMicrochipStats();
+  const { data: microchippedPets = [] } = useMicrochippedPets();
   const deleteMutation = useDeleteMicrochippedPet();
+  const isLoading = useMicrochipLoading();
   
   const filteredPets = microchippedPets.filter((pet: MicrochippedPet) =>
     pet.microchip_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,6 +59,58 @@ export function Microchips() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Gestão de Microchips</h1>
+            <p className="text-gray-600 mt-2">Acompanhe e gerencie registros de microchips de pets</p>
+          </div>
+          <RegisterMicrochipModal />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="animate-pulse">
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Pets Microchipados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="animate-pulse">
+              <div className="h-64 bg-gray-200 rounded"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -71,26 +123,26 @@ export function Microchips() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <Zap className="h-4 w-4" style={{ color: '#95CA3C' }} />
-                <div>
-                  <div className="text-2xl font-bold">
-                    {stats?.totalPets || 0}
-                  </div>
-                  <p className="text-sm text-gray-600">Total de Pets</p>
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <Zap className="h-4 w-4" style={{ color: '#95CA3C' }} />
+              <div>
+                <div className="text-2xl font-bold">
+                  {stats?.totalPets || 0}
                 </div>
+                <p className="text-sm text-gray-600">Total de Pets</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">
-                {stats?.microchippedPets || 0}
-              </div>
-              <p className="text-sm text-gray-600">Pets Microchipados</p>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold">
+              {stats?.microchippedPets || 0}
+            </div>
+            <p className="text-sm text-gray-600">Pets Microchipados</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -192,7 +244,6 @@ export function Microchips() {
             </Table>
           </CardContent>
         </Card>
-      </div>
 
       <DeletePetDialog
         petName={deleteDialog.petName}

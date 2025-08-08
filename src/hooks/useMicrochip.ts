@@ -37,3 +37,11 @@ export function useDeleteMicrochippedPet() {
     },
   });
 }
+
+export function useMicrochipLoading() {
+  const { isLoading: loadingStats } = useMicrochipStats();
+  const { isLoading: loadingPets } = usePets();
+  const { isLoading: loadingMicrochippedPets } = useMicrochippedPets();
+  
+  return loadingStats || loadingPets || loadingMicrochippedPets;
+}
