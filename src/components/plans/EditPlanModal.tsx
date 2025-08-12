@@ -17,12 +17,12 @@ interface EditPlanModalProps {
 export function EditPlanModal({ plan, trigger }: EditPlanModalProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Plan>>({
-    name: plan.name,
-    description: plan.description,
-    suggestedPrice: plan.suggestedPrice,
-    duration: plan.duration,
-    isActive: plan.isActive,
-    mainColor: plan.mainColor,
+    name: plan.name || '',
+    description: plan.description || '',
+    suggestedPrice: plan.suggestedPrice || 0,
+    duration: plan.duration || 30,
+    isActive: plan.isActive ?? true,
+    mainColor: plan.mainColor || '#95CA3C',
   });
 
   const updateMutation = useUpdatePlan();
@@ -30,11 +30,11 @@ export function EditPlanModal({ plan, trigger }: EditPlanModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.description || !formData.suggestedPrice) {
+    if (!formData.name || !formData.description || !formData.suggestedPrice || !plan.id) {
       return;
     }
 
-    updateMutation.mutate({ id: plan.id!, planData: formData }, {
+    updateMutation.mutate({ id: plan.id, planData: formData }, {
       onSuccess: () => {
         setOpen(false);
       },
@@ -54,7 +54,7 @@ export function EditPlanModal({ plan, trigger }: EditPlanModalProps) {
       </DialogTrigger>
       <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-[600px] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl">Editar Plano - {plan.name}</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Editar Plano - {plan.name || 'Sem Nome'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
