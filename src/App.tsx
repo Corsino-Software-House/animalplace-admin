@@ -22,8 +22,12 @@ import './App.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 2,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutos - dados ficam "frescos" por 5 min
+      gcTime: 10 * 60 * 1000, // 10 minutos - cache mantido por 10 min (novo nome para cacheTime)
+      refetchOnMount: 'always', // Sempre refetch ao montar componente
+      refetchInterval: false, // Desabilita refetch automático
     },
   },
 });
