@@ -12,7 +12,7 @@ import { Plan } from '@/types/plans';
 interface EditPlanModalProps {
   plan: Plan;
   trigger?: React.ReactNode;
-}
+} 
 
 export function EditPlanModal({ plan, trigger }: EditPlanModalProps) {
   const [open, setOpen] = useState(false);
