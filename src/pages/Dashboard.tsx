@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DashboardSkeleton } from '@/components/ui/dashboard-skeleton';
+import { EditMonthlyGoalModal } from '@/components/dashboard/EditMonthlyGoalModal';
 import { 
   Users, 
   CreditCard, 
@@ -15,40 +17,42 @@ import {
   Settings,
   TrendingUp,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Edit
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { getDashboardOverview } from '@/services/get-dashboard-overview';
-import { getRecentActivity } from '@/services/get-recent-activity';
-import { getSubscriptionMetrics } from '@/services/get-subscription-metrics';
-import { getSchedulingMetrics } from '@/services/get-scheduling-metrics';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+// Removidos imports de queries individuais
+import { getFullDashboard, FullDashboardResponse } from '@/services/get-full-dashboard';
+import { useMonthlyGoal } from '@/hooks/useMonthlyGoal';
 import { useState } from 'react';
 
 export function Dashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [isEditGoalModalOpen, setIsEditGoalModalOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const { monthlyGoal, setMonthlyGoal, isLoading: isLoadingGoal, defaultGoal, isCustomGoal } = useMonthlyGoal();
 
-  const { data: dashboardData, isLoading, error } = useQuery({
-    queryKey: ['dashboard-overview'],
-    queryFn: getDashboardOverview,
+  // Query única otimizada
+  const { 
+    data: fullDashboardData, 
+    isLoading, 
+    error 
+  } = useQuery<FullDashboardResponse>({
+    queryKey: ['full-dashboard'],
+    queryFn: getFullDashboard,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    refetchOnWindowFocus: false,
+    retry: 2,
   });
 
-  const { data: recentActivities = [], isLoading: isLoadingActivities } = useQuery({
-    queryKey: ['recent-activity'],
-    queryFn: getRecentActivity,
-  });
-
-  const { data: subscriptionMetrics, isLoading: isLoadingSubscriptions } = useQuery({
-    queryKey: ['subscription-metrics'],
-    queryFn: getSubscriptionMetrics,
-  });
-
-  const { data: schedulingMetrics, isLoading: isLoadingScheduling } = useQuery({
-    queryKey: ['scheduling-metrics'],
-    queryFn: getSchedulingMetrics,
-  });
+  const dashboardOverview = fullDashboardData?.overview;
+  const activities = fullDashboardData?.recentActivity || [];
+  const subscriptions = fullDashboardData?.metrics?.subscriptions;
+  const scheduling = fullDashboardData?.metrics?.scheduling;
 
   const refreshData = () => {
     setLastUpdated(new Date());
+    queryClient.invalidateQueries({ queryKey: ['full-dashboard'] });
   };
 
   const formatCurrency = (value: number): string => {
@@ -79,64 +83,10 @@ export function Dashboard() {
     return 'neutral';
   };
 
+  // console.log(subscriptions)
+
   if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {[...Array(4)].map((_, index) => (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-2"></div>
-                <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Atividades Recentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div>
-                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
-                        <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
-                      </div>
-                    </div>
-                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
-                ))}
-              </div>
-            </CardContent>
-          </Card> */}
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
@@ -160,7 +110,7 @@ export function Dashboard() {
               Não foi possível carregar os dados do dashboard. Verifique sua conexão e tente novamente.
             </p>
             <Button 
-              onClick={() => window.location.reload()} 
+              onClick={refreshData} 
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               Tentar novamente
@@ -173,38 +123,49 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6 lg:space-y-8">
-      <div className="text-center lg:text-left">
-        <h1 className="text-2xl lg:text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
+      <div className="flex justify-between items-start">
+        <div className="text-center lg:text-left">
+          <h1 className="text-2xl lg:text-3xl font-bold">Dashboard</h1>
+          <p className="text-gray-600 mt-2 text-sm lg:text-base">Bem-vindo de volta! Veja o que está acontecendo no AnimalPlace.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            onClick={refreshData} 
+            variant="outline"
+            size="sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatsCard
           title="Total de Usuários"
-          value={dashboardData?.totalUsers.value || 0}
-          change={dashboardData?.totalUsers.growth}
-          changeType={dashboardData?.totalUsers.growth ? getChangeType(dashboardData.totalUsers.growth) : 'neutral'}
+          value={dashboardOverview?.totalUsers.value || 0}
+          change={dashboardOverview?.totalUsers.growth}
+          changeType={dashboardOverview?.totalUsers.growth ? getChangeType(dashboardOverview.totalUsers.growth) : 'neutral'}
           icon={<Users className="h-4 w-4" />}
         />
         <StatsCard
           title="Receita Mensal"
-          value={dashboardData?.monthlyRevenue.value ? formatCurrency(dashboardData.monthlyRevenue.value) : 'R$ 0,00'}
-          change={dashboardData?.monthlyRevenue.growth}
-          changeType={dashboardData?.monthlyRevenue.growth ? getChangeType(dashboardData.monthlyRevenue.growth) : 'neutral'}
+          value={dashboardOverview?.monthlyRevenue.value ? formatCurrency(dashboardOverview.monthlyRevenue.value) : 'R$ 0,00'}
+          change={dashboardOverview?.monthlyRevenue.growth}
+          changeType={dashboardOverview?.monthlyRevenue.growth ? getChangeType(dashboardOverview.monthlyRevenue.growth) : 'neutral'}
           icon={<CreditCard className="h-4 w-4" />}
         />
         <StatsCard
           title="Planos Ativos"
-          value={dashboardData?.activePlans.value || 0}
-          change={dashboardData?.activePlans.growth}
-          changeType={dashboardData?.activePlans.growth ? getChangeType(dashboardData.activePlans.growth) : 'neutral'}
+          value={dashboardOverview?.activePlans.value || 0}
+          change={dashboardOverview?.activePlans.growth}
+          changeType={dashboardOverview?.activePlans.growth ? getChangeType(dashboardOverview.activePlans.growth) : 'neutral'}
           icon={<Package className="h-4 w-4" />}
         />
         <StatsCard
           title="Agendamentos Hoje"
-          value={dashboardData?.appointmentsToday.value || 0}
-          change={dashboardData?.appointmentsToday.growth}
-          changeType={dashboardData?.appointmentsToday.growth ? getChangeType(dashboardData.appointmentsToday.growth) : 'neutral'}
+          value={dashboardOverview?.appointmentsToday.value || 0}
+          change={dashboardOverview?.appointmentsToday.growth}
+          changeType={dashboardOverview?.appointmentsToday.growth ? getChangeType(dashboardOverview.appointmentsToday.growth) : 'neutral'}
           icon={<Calendar className="h-4 w-4" />}
         />
       </div>
@@ -216,23 +177,10 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {isLoadingActivities ? (
-                <div className="space-y-4">
-                  {[...Array(4)].map((_, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
-                        <div>
-                          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
-                          <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
-                        </div>
-                      </div>
-                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : recentActivities.length > 0 ? (
-                recentActivities.map((activity, index) => (
+              {isLoading ? (
+                <DashboardSkeleton section="activities" />
+              ) : activities && activities.length > 0 ? (
+                activities.map((activity: any, index: number) => (
                   <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
@@ -282,7 +230,7 @@ export function Dashboard() {
 
 
           <TabsContent value="subscriptions" className="space-y-4 lg:space-y-6">
-            {isLoadingSubscriptions ? (
+            {isLoading ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 {[...Array(3)].map((_, i) => (
                   <Card key={i}>
@@ -296,7 +244,7 @@ export function Dashboard() {
                   </Card>
                 ))}
               </div>
-            ) : subscriptionMetrics ? (
+            ) : subscriptions ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 <Card>
                   <CardHeader>
@@ -310,16 +258,16 @@ export function Dashboard() {
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-sm text-gray-600">Este mês</span>
-                          <span className="text-lg font-semibold">{subscriptionMetrics.newSubscriptionsThisMonth}</span>
+                          <span className="text-lg font-semibold">{subscriptions?.newSubscriptionsThisMonth || 0}</span>
                         </div>
-                        <Progress value={Math.min(subscriptionMetrics.growthPercentage, 100)} className="h-2" />
+                        <Progress value={Math.min(subscriptions?.growthPercentage || 0, 100)} className="h-2" />
                         <p className="text-xs text-green-600 mt-1">
-                          {subscriptionMetrics.growthPercentage > 0 ? '+' : ''}{subscriptionMetrics.growthPercentage.toFixed(1)}% vs mês anterior
+                          {subscriptions?.growthPercentage ? (subscriptions.growthPercentage > 0 ? '+' : '') + subscriptions.growthPercentage.toFixed(1) + '% vs mês anterior' : 'Sem dados'}
                         </p>
                       </div>
                       <div className="pt-4 border-t">
                         <div className="text-2xl font-bold text-center">
-                          {subscriptionMetrics.activeSubscriptions}
+                          {subscriptions?.activeSubscriptions || 0}
                         </div>
                         <p className="text-sm text-gray-600 text-center">Assinaturas Ativas</p>
                       </div>
@@ -339,19 +287,19 @@ export function Dashboard() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Pendentes</span>
                         <Badge variant="outline" className="text-orange-600">
-                          {subscriptionMetrics.pendingPayments}
+                          {subscriptions?.pendingPayments || 0}
                         </Badge>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Em atraso</span>
                         <Badge variant="destructive">
-                          {subscriptionMetrics.overduePayments}
+                          {subscriptions?.overduePayments || 0}
                         </Badge>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Em dia</span>
                         <Badge className="bg-green-100 text-green-800">
-                          {subscriptionMetrics.activeSubscriptions - subscriptionMetrics.pendingPayments - subscriptionMetrics.overduePayments}
+                          {(subscriptions?.activeSubscriptions || 0) - (subscriptions?.pendingPayments || 0) - (subscriptions?.overduePayments || 0)}
                         </Badge>
                       </div>
                     </div>
@@ -364,8 +312,8 @@ export function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {subscriptionMetrics.planDistribution && subscriptionMetrics.planDistribution.length > 0 ? (
-                        subscriptionMetrics.planDistribution.map((plan) => (
+                      {subscriptions?.planDistribution && subscriptions.planDistribution.length > 0 ? (
+                        subscriptions.planDistribution.map((plan: any) => (
                           <div key={plan.name} className="flex items-center gap-3">
                             <div 
                               className="w-3 h-3 rounded"
@@ -393,7 +341,7 @@ export function Dashboard() {
           </TabsContent>
 
           <TabsContent value="scheduling" className="space-y-4 lg:space-y-6">
-            {isLoadingScheduling ? (
+            {isLoading ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {[...Array(2)].map((_, i) => (
                   <Card key={i}>
@@ -406,7 +354,7 @@ export function Dashboard() {
                   </Card>
                 ))}
               </div>
-            ) : schedulingMetrics ? (
+            ) : scheduling ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <Card>
                   <CardHeader>
@@ -418,14 +366,41 @@ export function Dashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       <div className="text-center">
-                        <div className="text-3xl font-bold">{schedulingMetrics.totalSchedulesThisMonth}</div>
+                        <div className="text-3xl font-bold">{scheduling?.totalSchedulesThisMonth || 0}</div>
                         <p className="text-sm text-gray-600">Total este mês</p>
                         <p className="text-xs text-green-600 mt-1">
-                          {schedulingMetrics.growthPercentage > 0 ? '+' : ''}{schedulingMetrics.growthPercentage.toFixed(1)}% vs mês anterior
+                          {scheduling?.growthPercentage ? (scheduling.growthPercentage > 0 ? '+' : '') + scheduling.growthPercentage.toFixed(1) + '% vs mês anterior' : 'Sem dados'}
                         </p>
                       </div>
-                      <Progress value={Math.min((schedulingMetrics.totalSchedulesThisMonth / 170) * 100, 100)} className="h-2" />
-                      <p className="text-xs text-center text-gray-500">Meta mensal: 170 agendamentos</p>
+                      <Progress value={Math.min(((scheduling?.totalSchedulesThisMonth || 0) / monthlyGoal) * 100, 100)} className="h-2" />
+                      <div className="flex items-center justify-center gap-2">
+                        {isLoadingGoal ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-3 w-3 bg-gray-200 rounded animate-pulse"></div>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-xs text-gray-500">
+                              Meta mensal: {monthlyGoal} agendamentos
+                              {isCustomGoal && (
+                                <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  Personalizada
+                                </span>
+                              )}
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setIsEditGoalModalOpen(true)}
+                              className="h-auto p-1 text-xs text-gray-400 hover:text-gray-600"
+                              title="Editar meta mensal"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -437,15 +412,15 @@ export function Dashboard() {
                   <CardContent>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-blue-600">{schedulingMetrics.scheduledCount}</div>
+                        <div className="text-2xl font-bold text-blue-600">{scheduling?.scheduledCount || 0}</div>
                         <p className="text-xs text-gray-600">Agendados</p>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-green-600">{schedulingMetrics.completedCount}</div>
+                        <div className="text-2xl font-bold text-green-600">{scheduling?.completedCount || 0}</div>
                         <p className="text-xs text-gray-600">Realizados</p>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-red-600">{schedulingMetrics.cancelledCount}</div>
+                        <div className="text-2xl font-bold text-red-600">{scheduling?.cancelledCount || 0}</div>
                         <p className="text-xs text-gray-600">Cancelados</p>
                       </div>
                     </div>
@@ -460,6 +435,15 @@ export function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal para editar meta mensal */}
+      <EditMonthlyGoalModal
+        isOpen={isEditGoalModalOpen}
+        onClose={() => setIsEditGoalModalOpen(false)}
+        currentGoal={monthlyGoal}
+        onSave={setMonthlyGoal}
+        defaultGoal={defaultGoal}
+      />
     </div>
   );
 }

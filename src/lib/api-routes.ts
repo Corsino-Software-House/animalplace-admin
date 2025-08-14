@@ -2,6 +2,8 @@ export const DASHBOARD_OVERVIEW_ROUTE = () => '/api/dashboard/overview';
 
 export const DASHBOARD_RECENT_ACTIVITY_ROUTE = () => '/api/dashboard/recent-activity';
 
+export const DASHBOARD_FULL_ROUTE = () => '/api/dashboard/full-dashboard';
+
 export const DASHBOARD_SUBSCRIPTIONS_ROUTE = () => '/api/dashboard/subscriptions';
 
 export const DASHBOARD_SCHEDULING_ROUTE = () => '/api/dashboard/scheduling';

@@ -25,7 +25,9 @@ export function DeletePlanDialog({ plan, trigger }: DeletePlanDialogProps) {
   const deleteMutation = useDeletePlan();
 
   const handleDelete = () => {
-    deleteMutation.mutate(plan.id!, {
+    if (!plan.id) return;
+    
+    deleteMutation.mutate(plan.id, {
       onSuccess: () => {
         setOpen(false);
       },
@@ -47,7 +49,7 @@ export function DeletePlanDialog({ plan, trigger }: DeletePlanDialogProps) {
         <AlertDialogHeader>
           <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem certeza que deseja excluir o plano "{plan.name}"? 
+            Tem certeza que deseja excluir o plano "{plan.name || 'Sem Nome'}"? 
             Esta ação não pode ser desfeita e pode afetar usuários que possuem este plano.
           </AlertDialogDescription>
         </AlertDialogHeader>

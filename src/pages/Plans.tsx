@@ -37,14 +37,14 @@ export function Plans() {
 
     const term = debouncedSearchTerm.toLowerCase().trim();
     return plans.filter(plan => 
-      plan.name.toLowerCase().includes(term) ||
-      plan.description.toLowerCase().includes(term) ||
-      formatPrice(plan.suggestedPrice).toLowerCase().includes(term)
+      (plan.name || '').toLowerCase().includes(term) ||
+      (plan.description || '').toLowerCase().includes(term) ||
+      (plan.suggestedPrice ? formatPrice(plan.suggestedPrice).toLowerCase() : '').includes(term)
     );
   }, [plans, debouncedSearchTerm]);
 
   const totalPlans = filteredPlans?.length || 0;
-  const activePlans = filteredPlans?.filter(plan => plan.isActive).length || 0;
+  const activePlans = filteredPlans?.filter(plan => plan.isActive ?? true).length || 0;
   const totalServices = filteredPlans?.reduce((acc, plan) => acc + (plan.serviceIds?.length || 0), 0) || 0;
   const totalFreeServices = filteredPlans?.reduce((acc, plan) => acc + (plan.freeServices?.length || 0), 0) || 0;
   if (error) {
@@ -150,97 +150,99 @@ export function Plans() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredPlans.map((plan) => (
-            <PlanDetailsModal
-              key={plan.id}
-              planId={plan.id!}
-              trigger={
-                <Card className="relative flex flex-col h-full cursor-pointer hover:shadow-lg transition-shadow" style={{ borderColor: plan.mainColor }}>
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-lg sm:text-xl truncate">{plan.name}</CardTitle>
-                        <div className="mt-2">
-                          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
-                            <span className="text-2xl sm:text-3xl font-bold">{formatPrice(plan.suggestedPrice)}</span>
-                            <span className="text-gray-500 text-sm">/{plan.duration} dias</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end space-y-2 shrink-0">
-                        <Badge 
-                          variant={plan.isActive ? 'default' : 'secondary'}
-                          style={plan.isActive ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
-                          className="text-xs"
-                        >
-                          {plan.isActive ? 'Ativo' : 'Inativo'}
-                        </Badge>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              className="h-8 w-8 p-0 bg-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <EditPlanModal 
-                              plan={plan}
-                              trigger={
-                                <DropdownMenuItem>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Editar Plano
-                                </DropdownMenuItem>
-                              }
-                            />
-                            <DeletePlanDialog 
-                              plan={plan}
-                              trigger={
-                                <DropdownMenuItem className="text-red-600">
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Excluir Plano
-                                </DropdownMenuItem>
-                              }
-                            />
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 pt-0">
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="text-xs sm:text-sm text-gray-600">
-                        <p className="line-clamp-2">{plan.description}</p>
-                      </div>
-                      
-                      {plan.serviceIds && plan.serviceIds.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-xs sm:text-sm font-medium">Serviços Incluídos:</p>
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600 gap-2">
-                            <Check className="h-3 w-3 shrink-0" style={{ color: '#95CA3C' }} />
-                            <span>{plan.serviceIds.length} serviços disponíveis</span>
-                          </div>
-                          {plan.freeServices && plan.freeServices.length > 0 && (
-                            <div className="flex items-center text-xs sm:text-sm text-green-600 gap-2">
-                              <Check className="h-3 w-3 shrink-0" />
-                              <span>{plan.freeServices.length} gratuitos</span>
+            plan.id && (
+              <PlanDetailsModal
+                key={plan.id}
+                planId={plan.id}
+                trigger={
+                  <Card className="relative flex flex-col h-full cursor-pointer hover:shadow-lg transition-shadow" style={plan.mainColor ? { borderColor: plan.mainColor } : {}}>
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-lg sm:text-xl truncate">{plan.name || 'Sem Nome'}</CardTitle>
+                          <div className="mt-2">
+                            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1">
+                              <span className="text-2xl sm:text-3xl font-bold">{plan.suggestedPrice ? formatPrice(plan.suggestedPrice) : 'N/A'}</span>
+                              <span className="text-gray-500 text-sm">/{plan.duration || 'N/A'} dias</span>
                             </div>
-                          )}
+                          </div>
                         </div>
-                      )}
+                        <div className="flex flex-col items-end space-y-2 shrink-0">
+                          <Badge 
+                            variant={(plan.isActive ?? true) ? 'default' : 'secondary'}
+                            style={(plan.isActive ?? true) ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
+                            className="text-xs"
+                          >
+                            {(plan.isActive ?? true) ? 'Ativo' : 'Inativo'}
+                          </Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                className="h-8 w-8 p-0 bg-transparent"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <EditPlanModal 
+                                plan={plan}
+                                trigger={
+                                  <DropdownMenuItem>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar Plano
+                                  </DropdownMenuItem>
+                                }
+                              />
+                              <DeletePlanDialog 
+                                plan={plan}
+                                trigger={
+                                  <DropdownMenuItem className="text-red-600">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Excluir Plano
+                                  </DropdownMenuItem>
+                                }
+                              />
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-1 pt-0">
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="text-xs sm:text-sm text-gray-600">
+                          <p className="line-clamp-2">{plan.description || 'Sem descrição'}</p>
+                        </div>
+                        
+                        {(plan.serviceIds && plan.serviceIds.length > 0) && (
+                          <div className="space-y-2">
+                            <p className="text-xs sm:text-sm font-medium">Serviços Incluídos:</p>
+                            <div className="flex items-center text-xs sm:text-sm text-gray-600 gap-2">
+                              <Check className="h-3 w-3 shrink-0" style={{ color: '#95CA3C' }} />
+                              <span>{plan.serviceIds.length} serviços disponíveis</span>
+                            </div>
+                            {(plan.freeServices && plan.freeServices.length > 0) && (
+                              <div className="flex items-center text-xs sm:text-sm text-green-600 gap-2">
+                                <Check className="h-3 w-3 shrink-0" />
+                                <span>{plan.freeServices.length} gratuitos</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
-                      {plan.specialRules?.microchipFree && (
-                        <div className="flex items-center text-xs sm:text-sm gap-2" style={{ color: plan.mainColor }}>
-                          <Check className="h-3 w-3 shrink-0" />
-                          <span>Microchip gratuito</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              }
-            />
+                        {(plan.specialRules && plan.specialRules.microchipFree) && (
+                          <div className="flex items-center text-xs sm:text-sm gap-2" style={plan.mainColor ? { color: plan.mainColor } : {}}>
+                            <Check className="h-3 w-3 shrink-0" />
+                            <span>Microchip gratuito</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                }
+              />
+            )
           ))}
         </div>
       )}
@@ -304,7 +306,7 @@ export function Plans() {
                 <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-2" />
               ) : (
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-600">
-                  {filteredPlans.filter(p => p.specialRules?.microchipFree).length}
+                  {filteredPlans.filter(p => p.specialRules && p.specialRules.microchipFree).length}
                 </div>
               )}
               <p className="text-xs sm:text-sm text-gray-600 mt-1">Com Microchip Grátis</p>

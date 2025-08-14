@@ -92,16 +92,18 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
           <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div
-                  className="w-3 h-3 sm:w-4 sm:h-4 rounded-full"
-                  style={{ backgroundColor: plan.mainColor }}
-                />
+                {plan.mainColor && (
+                  <div
+                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-full"
+                    style={{ backgroundColor: plan.mainColor }}
+                  />
+                )}
                 <Badge 
-                  variant={plan.isActive ? 'default' : 'secondary'}
-                  style={plan.isActive ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
+                  variant={(plan.isActive ?? true) ? 'default' : 'secondary'}
+                  style={(plan.isActive ?? true) ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
                   className="text-xs sm:text-sm"
                 >
-                  {plan.isActive ? 'Ativo' : 'Inativo'}
+                  {(plan.isActive ?? true) ? 'Ativo' : 'Inativo'}
                 </Badge>
               </div>
             </div>
@@ -110,7 +112,7 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               <Card>
                 <CardContent className="p-3 sm:p-4">
                   <div className="text-lg sm:text-2xl font-bold text-green-600">
-                    {formatPrice(plan.suggestedPrice)}
+                    {plan.suggestedPrice ? formatPrice(plan.suggestedPrice) : 'N/A'}
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600">Preço Sugerido</p>
                 </CardContent>
@@ -119,7 +121,7 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               <Card>
                 <CardContent className="p-3 sm:p-4">
                   <div className="text-lg sm:text-2xl font-bold text-blue-600">
-                    {plan.duration}
+                    {plan.duration || 'N/A'}
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600">Dias de Duração</p>
                 </CardContent>
@@ -128,7 +130,7 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               <Card>
                 <CardContent className="p-3 sm:p-4">
                   <div className="text-lg sm:text-2xl font-bold text-purple-600">
-                    {(plan.serviceIds?.length || 0) + (plan.freeServices?.length || 0)}
+                    {((plan.serviceIds?.length || 0) + (plan.freeServices?.length || 0))}
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600">Serviços Inclusos</p>
                 </CardContent>
@@ -138,14 +140,14 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
             <div className="space-y-2">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Descrição</h4>
               <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                {plan.description}
+                {plan.description || 'Nenhuma descrição disponível'}
               </p>
             </div>
 
             <div className="space-y-3 sm:space-y-4">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Limites de Serviços</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
-                {Object.entries(plan.serviceLimits).map(([serviceType, limits]) => (
+                {plan.serviceLimits && Object.entries(plan.serviceLimits).map(([serviceType, limits]) => (
                   <Card key={serviceType}>
                     <CardContent className="p-3 sm:p-4">
                       <h5 className="font-medium mb-1 sm:mb-2 text-xs sm:text-sm">
@@ -161,11 +163,11 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             </div>
 
-            {plan.serviceIds && plan.serviceIds.length > 0 && (
+            {(plan.serviceIds && plan.serviceIds.length > 0) && (
               <div className="space-y-3 sm:space-y-4">
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Incluídos no Plano ({plan.serviceIds.length})</h4>
+                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Incluídos no Plano ({(plan.serviceIds || []).length})</h4>
                 <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                  {plan.serviceIds.map((serviceId, index) => {
+                  {(plan.serviceIds || []).map((serviceId, index) => {
                     const service = services.find(s => s.id === serviceId);
                     return (
                       <div key={index} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -204,11 +206,11 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             )}
 
-            {plan.freeServices && plan.freeServices.length > 0 && (
+            {(plan.freeServices && plan.freeServices.length > 0) && (
               <div className="space-y-3 sm:space-y-4">
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Gratuitos ({plan.freeServices.length})</h4>
+                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços Gratuitos ({(plan.freeServices || []).length})</h4>
                 <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                  {plan.freeServices.map((serviceId, index) => {
+                  {(plan.freeServices || []).map((serviceId, index) => {
                     const service = services.find(s => s.id === serviceId);
                     return (
                       <div key={index} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200">
@@ -242,11 +244,11 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
               </div>
             )}
 
-            {plan.appPurchaseServices && plan.appPurchaseServices.length > 0 && (
+            {(plan.appPurchaseServices && plan.appPurchaseServices.length > 0) && (
               <div className="space-y-3 sm:space-y-4">
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços para Compra no App ({plan.appPurchaseServices.length})</h4>
+                <h4 className="font-medium text-gray-900 text-sm sm:text-base">Serviços para Compra no App ({(plan.appPurchaseServices || []).length})</h4>
                 <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                  {plan.appPurchaseServices.map((serviceId, index) => {
+                  {(plan.appPurchaseServices || []).map((serviceId, index) => {
                     const service = services.find(s => s.id === serviceId);
                     return (
                       <div key={index} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-purple-50 rounded-lg border border-purple-200">
@@ -283,14 +285,18 @@ export function PlanDetailsModal({ planId, trigger }: PlanDetailsModalProps) {
             <div className="space-y-3 sm:space-y-4">
               <h4 className="font-medium text-gray-900 text-sm sm:text-base">Regras Especiais</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${plan.specialRules.microchipFree ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-xs sm:text-sm">Microchip gratuito</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${plan.specialRules.aestheticViaApp ? 'bg-green-500' : 'bg-gray-300'}`} />
-                  <span className="text-xs sm:text-sm">Serviços estéticos via app</span>
-                </div>
+                {plan.specialRules && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${plan.specialRules.microchipFree ? 'bg-green-500' : 'bg-gray-300'}`} />
+                      <span className="text-xs sm:text-sm">Microchip gratuito</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${plan.specialRules.aestheticViaApp ? 'bg-green-500' : 'bg-gray-300'}`} />
+                      <span className="text-xs sm:text-sm">Serviços estéticos via app</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
