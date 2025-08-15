@@ -4,17 +4,7 @@ import { DashboardOverview, RecentActivity } from "@/types/dashboard";
 
 export interface FullDashboardResponse {
   overview: DashboardOverview;
-  recentActivity: {
-    activities: RecentActivity[];
-    pagination: {
-      currentPage: number;
-      totalPages: number;
-      totalItems: number;
-      itemsPerPage: number;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
-  };
+  recentActivity: RecentActivity[];
   metrics: {
     subscriptions: {
       activeSubscriptions: number;
