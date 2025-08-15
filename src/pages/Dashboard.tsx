@@ -6,15 +6,12 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardSkeleton } from '@/components/ui/dashboard-skeleton';
 import { EditMonthlyGoalModal } from '@/components/dashboard/EditMonthlyGoalModal';
+import { RecentActivitiesCard } from '@/components/dashboard/RecentActivitiesCard';
 import { 
   Users, 
   CreditCard, 
   Package, 
   Calendar, 
-  User, 
-  DollarSign, 
-  CalendarDays, 
-  Settings,
   TrendingUp,
   AlertCircle,
   RefreshCw,
@@ -46,7 +43,6 @@ export function Dashboard() {
   });
 
   const dashboardOverview = fullDashboardData?.overview;
-  const activities = fullDashboardData?.recentActivity || [];
   const subscriptions = fullDashboardData?.metrics?.subscriptions;
   const scheduling = fullDashboardData?.metrics?.scheduling;
 
@@ -60,21 +56,6 @@ export function Dashboard() {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
-  };
-
-  const getActivityIcon = (iconType: string) => {
-    switch (iconType) {
-      case 'user':
-        return <User className="w-4 h-4" />;
-      case 'payment':
-        return <DollarSign className="w-4 h-4" />;
-      case 'appointment':
-        return <CalendarDays className="w-4 h-4" />;
-      case 'settings':
-        return <Settings className="w-4 h-4" />;
-      default:
-        return <User className="w-4 h-4" />;
-    }
   };
 
   const getChangeType = (growth: string): 'positive' | 'negative' | 'neutral' => {
@@ -171,38 +152,7 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Atividades Recentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isLoading ? (
-                <DashboardSkeleton section="activities" />
-              ) : activities && activities.length > 0 ? (
-                activities.map((activity: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
-                        {getActivityIcon(activity.icon)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{activity.type}</p>
-                        <p className="text-xs text-gray-500">{activity.description}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-400">{activity.timeAgo}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>Nenhuma atividade recente encontrada</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
+        <RecentActivitiesCard />
       </div>
 
       <div className="space-y-4 lg:space-y-6">
