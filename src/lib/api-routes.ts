@@ -71,3 +71,18 @@ export const GET_SCHEDULE_SERVICE_ROUTE = () => '/api/scheduling/without-token';
 export const RESCHEDULE_SERVICE_ROUTE = (id: string) => `/api/scheduling/${id}/reagendamento-admin`;
 
 export const DELETE_SCHEDULE_SERVICE_ROUTE = (id: string) => `/api/scheduling/${id}/cancelamento-admin`;
+
+// Profissionais
+export const PROFESSIONALS_API = {
+  ALL: '/api/scheduling/professionals/all',
+  BY_ID: (id: string) => `/api/scheduling/professionals/${id}`,
+  CREATE: '/api/scheduling/professionals',
+  UPDATE: (id: string) => `/api/scheduling/professionals/${id}`,
+  DELETE: (id: string) => `/api/scheduling/professionals/${id}`,
+  BY_SERVICE: (serviceId?: string, type?: string) => {
+    const params = new URLSearchParams();
+    if (serviceId) params.append('serviceId', serviceId);
+    if (type) params.append('type', type);
+    return `/api/scheduling/professionals?${params.toString()}`;
+  },
+};
