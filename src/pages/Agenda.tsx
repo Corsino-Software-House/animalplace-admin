@@ -40,6 +40,7 @@ import { useSchedule } from '@/hooks/useSchedule';
 import { RescheduleModal } from '@/components/agenda/RescheduleModal';
 import { DeleteScheduleDialog } from '@/components/agenda/DeleteScheduleDialog';
 import { ScheduleDetailsModal } from '@/components/agenda/ScheduleDetailsModal';
+import { ProfessionalsManager } from '@/components/agenda/ProfessionalsManager';
 import { Scheduling } from '@/types/schedule';
 
 
@@ -51,6 +52,7 @@ export function Agenda() {
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [showProfessionals, setShowProfessionals] = useState(false);
   
   const { schedules, loading, error, fetchSchedules, reschedule, deleteSchedule } = useSchedule();
 
@@ -139,7 +141,7 @@ export function Agenda() {
             <h1 className="text-2xl sm:text-3xl font-bold">Agenda & Calendário</h1>
             <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Gerencie todos os agendamentos e serviços</p>
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto flex gap-2">
             <Button 
               variant="outline" 
               onClick={fetchSchedules}
@@ -150,10 +152,15 @@ export function Agenda() {
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               Atualizar
             </Button>
-            {/* <Button style={{ backgroundColor: '#95CA3C' }} className="text-white hover:opacity-90">
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Agendamento
-            </Button> */}
+            <Button 
+              variant="outline"
+              onClick={() => setShowProfessionals(!showProfessionals)}
+              size="sm"
+              className="w-full sm:w-auto"
+            >
+              <User className="mr-2 h-4 w-4" />
+              {showProfessionals ? 'Ocultar Profissionais' : 'Gerenciar Profissionais'}
+            </Button>
           </div>
       </div>
 
@@ -163,6 +170,8 @@ export function Agenda() {
           <p>{error}</p>
         </div>
       )}
+
+      {showProfessionals && <ProfessionalsManager />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover:shadow-md transition-shadow">

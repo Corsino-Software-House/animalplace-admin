@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, Edit, Trash2, AlertCircle, Search, X, Loader2, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, AlertCircle, Search, X, Loader2, Filter, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useServices } from '@/hooks/useServices';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -25,6 +25,7 @@ import { CreateServiceModal } from '@/components/services/CreateServiceModal';
 import { EditServiceModal } from '@/components/services/EditServiceModal';
 import { DeleteServiceDialog } from '@/components/services/DeleteServiceDialog';
 import { ServiceDetailsModal } from '@/components/services/ServiceDetailsModal';
+import { ManualServiceRecordModal } from '@/components/services/ManualServiceRecordModal';
 import { ServiceType, ServiceCategory } from '@/types/services';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -152,7 +153,15 @@ export function Services() {
             <h1 className="text-2xl sm:text-3xl font-bold">Gerenciamento de Serviços</h1>
             <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Gerencie seu catálogo de serviços</p>
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto flex gap-2">
+            <ManualServiceRecordModal
+              trigger={
+                <Button variant="outline" className="whitespace-nowrap">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Baixa Manual
+                </Button>
+              }
+            />
             <CreateServiceModal />
           </div>
         </div>
