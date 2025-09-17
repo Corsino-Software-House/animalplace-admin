@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,8 +33,7 @@ import {
   Trash2, 
   MoreHorizontal,
   Clock,
-  User,
-  Calendar
+  User
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { PROFESSIONALS_API } from '@/lib/api-routes';
