@@ -33,7 +33,7 @@ import {
   Trash2, 
   MoreHorizontal,
   Clock,
-  User,
+  User
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { PROFESSIONALS_API } from '@/lib/api-routes';
