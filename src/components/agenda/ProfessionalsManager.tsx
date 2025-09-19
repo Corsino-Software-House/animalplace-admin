@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,7 +34,6 @@ import {
   MoreHorizontal,
   Clock,
   User,
-  Calendar
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { PROFESSIONALS_API } from '@/lib/api-routes';
@@ -103,6 +102,16 @@ const defaultFormData: ProfessionalFormData = {
   serviceTypes: [],
   maxConcurrentAppointments: 1,
   breakDuration: 0,
+};
+
+const dayLabels: Record<keyof WorkingHours, string> = {
+  monday: 'Segunda-feira',
+  tuesday: 'Terça-feira',
+  wednesday: 'Quarta-feira',
+  thursday: 'Quinta-feira',
+  friday: 'Sexta-feira',
+  saturday: 'Sábado',
+  sunday: 'Domingo',
 };
 
 export function ProfessionalsManager() {
@@ -359,7 +368,7 @@ export function ProfessionalsManager() {
                   {Object.entries(formData.workingHours).map(([day, hours]) => (
                     <div key={day} className="flex items-center space-x-4 p-3 border rounded-lg">
                       <div className="w-20">
-                        <Label className="capitalize">{day}</Label>
+                        <Label className="capitalize">{dayLabels[day as keyof WorkingHours]}</Label>
                       </div>
                       <Switch
                         checked={hours.isWorking}
@@ -435,7 +444,7 @@ export function ProfessionalsManager() {
                           .filter(([_, hours]) => hours.isWorking)
                           .map(([day, hours]) => (
                             <div key={day} className="capitalize">
-                              {day}: {formatTime(hours.start)}-{formatTime(hours.end)}
+                              {dayLabels[day as keyof WorkingHours]}: {formatTime(hours.start)}-{formatTime(hours.end)}
                             </div>
                           ))}
                       </div>
