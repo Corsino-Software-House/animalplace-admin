@@ -104,6 +104,16 @@ const defaultFormData: ProfessionalFormData = {
   breakDuration: 0,
 };
 
+const dayLabels: Record<keyof WorkingHours, string> = {
+  monday: 'Segunda-feira',
+  tuesday: 'Terça-feira',
+  wednesday: 'Quarta-feira',
+  thursday: 'Quinta-feira',
+  friday: 'Sexta-feira',
+  saturday: 'Sábado',
+  sunday: 'Domingo',
+};
+
 export function ProfessionalsManager() {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(false);
@@ -358,7 +368,7 @@ export function ProfessionalsManager() {
                   {Object.entries(formData.workingHours).map(([day, hours]) => (
                     <div key={day} className="flex items-center space-x-4 p-3 border rounded-lg">
                       <div className="w-20">
-                        <Label className="capitalize">{day}</Label>
+                        <Label className="capitalize">{dayLabels[day as keyof WorkingHours]}</Label>
                       </div>
                       <Switch
                         checked={hours.isWorking}
@@ -434,7 +444,7 @@ export function ProfessionalsManager() {
                           .filter(([_, hours]) => hours.isWorking)
                           .map(([day, hours]) => (
                             <div key={day} className="capitalize">
-                              {day}: {formatTime(hours.start)}-{formatTime(hours.end)}
+                              {dayLabels[day as keyof WorkingHours]}: {formatTime(hours.start)}-{formatTime(hours.end)}
                             </div>
                           ))}
                       </div>
