@@ -40,7 +40,7 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
     <>
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={onToggle}
         />
       )}
@@ -49,22 +49,22 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
         "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
-      <div className="p-4 lg:p-6 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 lg:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Paw className="h-6 w-6 lg:h-8 lg:w-8" style={{ color: '#95CA3C' }} />
-            <span className="text-lg lg:text-xl font-semibold">AnimalPlace</span>
+            <Paw className="w-6 h-6 lg:h-8 lg:w-8" style={{ color: '#95CA3C' }} />
+            <span className="text-lg font-semibold lg:text-xl">AnimalPlace</span>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden p-1"
+            className="p-1 lg:hidden"
             onClick={onToggle}
           >
-            <X className="h-5 w-5" />
+            <X className="w-5 h-5" />
           </Button>
         </div>
-        <p className="text-xs lg:text-sm text-gray-500 mt-1">Admin Dashboard</p>
+        <p className="mt-1 text-xs text-gray-500 lg:text-sm">Admin Dashboard</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
@@ -86,7 +86,7 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
                 }
               }}
             >
-              <item.icon className="mr-3 h-4 w-4 flex-shrink-0" />
+              <item.icon className="flex-shrink-0 w-4 h-4 mr-3" />
               <span className="truncate">{item.name}</span>
             </NavLink>
           );
@@ -94,8 +94,8 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3 mb-3">
-          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+        <div className="flex items-center mb-3 space-x-3">
+          <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
             <span className="text-sm font-medium text-green-700">
               {user?.name ? getInitials(user.name) : 'U'}
             </span>
@@ -115,7 +115,7 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
           size="sm"
           className="w-full text-gray-600 hover:text-red-600 hover:border-red-200"
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="w-4 h-4 mr-2" />
           Sair
         </Button>
       </div>

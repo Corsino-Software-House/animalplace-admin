@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '@/components/ui/switch';
 import { Plus } from 'lucide-react';
 import { useCreateService } from '@/hooks/useServices';
-import { ServiceType, ServiceCategory, ServiceDto } from '@/types/services';
+import { ServiceType, ServiceCategory, ServiceDto, PetSize } from '@/types/services';
 
 interface CreateServiceModalProps {
   trigger?: React.ReactNode;
@@ -23,6 +23,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
     duration: 0,
     type: ServiceType.CONSULTATION,
     category: ServiceCategory.CLINICAL,
+    petSize: 'all' as PetSize,
     isActive: true,
   });
 
@@ -45,6 +46,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
           duration: 0,
           type: ServiceType.CONSULTATION,
           category: ServiceCategory.CLINICAL,
+          petSize: 'all' as PetSize,
           isActive: true,
         });
       },
@@ -52,8 +54,8 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
   };
 
   const defaultTrigger = (
-    <Button style={{ backgroundColor: '#95CA3C' }} className="text-white hover:opacity-90 w-full sm:w-auto">
-      <Plus className="mr-2 h-4 w-4" />
+    <Button style={{ backgroundColor: '#95CA3C' }} className="w-full text-white hover:opacity-90 sm:w-auto">
+      <Plus className="w-4 h-4 mr-2" />
       Adicionar Serviço
     </Button>
   );
@@ -68,7 +70,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
           <DialogTitle className="text-lg sm:text-xl">Criar Novo Serviço</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Nome *</Label>
               <Input
@@ -107,7 +109,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="duration">Duração (minutos) *</Label>
               <Input
@@ -145,24 +147,48 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoria *</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value: ServiceCategory) => setFormData(prev => ({ ...prev, category: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione a categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ServiceCategory.CLINICAL}>Clínico</SelectItem>
-                <SelectItem value={ServiceCategory.AESTHETIC}>Estético</SelectItem>
-                <SelectItem value={ServiceCategory.SURGICAL}>Cirúrgico</SelectItem>
-                <SelectItem value={ServiceCategory.DIAGNOSTIC}>Diagnóstico</SelectItem>
-                <SelectItem value={ServiceCategory.VACCINE}>Vacina</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoria *</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value: ServiceCategory) => setFormData(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ServiceCategory.CLINICAL}>Clínico</SelectItem>
+                  <SelectItem value={ServiceCategory.AESTHETIC}>Estético</SelectItem>
+                  <SelectItem value={ServiceCategory.SURGICAL}>Cirúrgico</SelectItem>
+                  <SelectItem value={ServiceCategory.DIAGNOSTIC}>Diagnóstico</SelectItem>
+                  <SelectItem value={ServiceCategory.VACCINE}>Vacina</SelectItem>
+                  <SelectItem value={ServiceCategory.TRANSPORT}>Transporte</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="petSize">Porte do Animal</Label>
+              <Select
+                value={formData.petSize}
+                onValueChange={(value: PetSize) => setFormData(prev => ({ ...prev, petSize: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o porte" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os portes</SelectItem>
+                  <SelectItem value="small">Pequeno</SelectItem>
+                  <SelectItem value="medium">Médio</SelectItem>
+                  <SelectItem value="large">Grande</SelectItem>
+                  <SelectItem value="extra_large">Extra Grande (GG)</SelectItem>
+                  <SelectItem value="giant">Gigante</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <div className="flex items-center space-x-2">
             <Switch
               id="isActive"
@@ -172,7 +198,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
             <Label htmlFor="isActive">Serviço ativo</Label>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+          <div className="flex flex-col justify-end pt-4 space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
             <Button 
               type="button" 
               variant="outline" 
@@ -185,7 +211,7 @@ export function CreateServiceModal({ trigger }: CreateServiceModalProps) {
               type="submit" 
               disabled={createMutation.isPending}
               style={{ backgroundColor: '#95CA3C' }}
-              className="text-white hover:opacity-90 w-full sm:w-auto"
+              className="w-full text-white hover:opacity-90 sm:w-auto"
             >
               {createMutation.isPending ? 'Criando...' : 'Criar Serviço'}
             </Button>
