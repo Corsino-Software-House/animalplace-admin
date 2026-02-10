@@ -30,12 +30,13 @@ import { ServiceType, ServiceCategory } from '@/types/services';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const getCategoryLabel = (category: ServiceCategory) => {
-  const labels = {
+  const labels: Record<ServiceCategory, string> = {
     [ServiceCategory.CLINICAL]: 'Clínico',
     [ServiceCategory.AESTHETIC]: 'Estético',
     [ServiceCategory.SURGICAL]: 'Cirúrgico',
     [ServiceCategory.DIAGNOSTIC]: 'Diagnóstico',
     [ServiceCategory.VACCINE]: 'Vacina',
+    [ServiceCategory.TRANSPORT]: 'Transporte',
   };
   return labels[category] || category;
 };
@@ -136,8 +137,8 @@ export function Services() {
       <div className="space-y-6">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Erro ao carregar serviços</h3>
+            <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            <h3 className="mb-2 text-lg font-semibold">Erro ao carregar serviços</h3>
             <p className="text-gray-600">Não foi possível carregar a lista de serviços. Tente novamente.</p>
           </div>
         </div>
@@ -146,18 +147,18 @@ export function Services() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+    <div className="p-4 space-y-4 sm:space-y-6 sm:p-6">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Gerenciamento de Serviços</h1>
-            <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Gerencie seu catálogo de serviços</p>
+            <h1 className="text-2xl font-bold sm:text-3xl">Gerenciamento de Serviços</h1>
+            <p className="mt-1 text-sm text-gray-600 sm:mt-2 sm:text-base">Gerencie seu catálogo de serviços</p>
           </div>
-          <div className="w-full sm:w-auto flex gap-2">
+          <div className="flex w-full gap-2 sm:w-auto">
             <ManualServiceRecordModal
               trigger={
                 <Button variant="outline" className="whitespace-nowrap">
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <CheckCircle className="w-4 h-4 mr-2" />
                   Baixa Manual
                 </Button>
               }
@@ -166,32 +167,32 @@ export function Services() {
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative max-w-md w-full sm:w-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="relative w-full max-w-md sm:w-auto">
+            <Search className="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
             <Input
               placeholder="Pesquisar serviços..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10 pr-10"
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+            <div className="absolute flex items-center transform -translate-y-1/2 right-3 top-1/2">
               {isFiltering && searchTerm && (
-                <Loader2 className="h-4 w-4 text-gray-400 animate-spin mr-2" />
+                <Loader2 className="w-4 h-4 mr-2 text-gray-400 animate-spin" />
               )}
               {searchTerm && (
                 <button
                   onClick={() => handleSearchChange('')}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 transition-colors hover:text-gray-600"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
           </div>
           
           <div className="flex items-center gap-2 min-w-[200px]">
-            <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            <Filter className="flex-shrink-0 w-4 h-4 text-gray-400" />
             <Select value={selectedCategory} onValueChange={handleCategoryChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filtrar por categoria" />
@@ -218,40 +219,40 @@ export function Services() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-        <Card className="hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 sm:gap-4 lg:gap-6">
+        <Card className="transition-shadow hover:shadow-md">
           <CardContent className="p-3 sm:p-4 lg:pt-6">
             <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
               {isLoading ? (
-                <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-2" />
+                <Skeleton className="w-12 h-6 mb-2 sm:h-8 sm:w-16" />
               ) : (
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">{totalServices}</div>
+                <div className="text-lg font-bold text-blue-600 sm:text-xl lg:text-2xl">{totalServices}</div>
               )}
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">Total de Serviços</p>
+              <p className="mt-1 text-xs text-gray-600 sm:text-sm">Total de Serviços</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="transition-shadow hover:shadow-md">
           <CardContent className="p-3 sm:p-4 lg:pt-6">
             <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
               {isLoading ? (
-                <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-2" />
+                <Skeleton className="w-12 h-6 mb-2 sm:h-8 sm:w-16" />
               ) : (
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">{activeServices}</div>
+                <div className="text-lg font-bold text-green-600 sm:text-xl lg:text-2xl">{activeServices}</div>
               )}
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">Serviços Ativos</p>
+              <p className="mt-1 text-xs text-gray-600 sm:text-sm">Serviços Ativos</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="col-span-2 lg:col-span-1 hover:shadow-md transition-shadow">
+        <Card className="col-span-2 transition-shadow lg:col-span-1 hover:shadow-md">
           <CardContent className="p-3 sm:p-4 lg:pt-6">
             <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
               {isLoading ? (
-                <Skeleton className="h-6 sm:h-8 w-12 sm:w-16 mb-2" />
+                <Skeleton className="w-12 h-6 mb-2 sm:h-8 sm:w-16" />
               ) : (
-                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">{categories}</div>
+                <div className="text-lg font-bold text-purple-600 sm:text-xl lg:text-2xl">{categories}</div>
               )}
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">Categorias</p>
+              <p className="mt-1 text-xs text-gray-600 sm:text-sm">Categorias</p>
             </div>
           </CardContent>
         </Card>
@@ -265,9 +266,9 @@ export function Services() {
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg">
-                  <Skeleton className="h-12 w-12 rounded" />
-                  <div className="space-y-2 flex-1">
+                <div key={i} className="flex items-center p-4 space-x-4 border rounded-lg">
+                  <Skeleton className="w-12 h-12 rounded" />
+                  <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-[200px]" />
                     <Skeleton className="h-4 w-[100px]" />
                   </div>
@@ -275,11 +276,11 @@ export function Services() {
               ))}
             </div>
           ) : filteredServices.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <div className="text-gray-500">
                 {debouncedSearchTerm || selectedCategory !== 'all' ? (
                   <>
-                    <p className="text-lg font-medium mb-2">Nenhum serviço encontrado</p>
+                    <p className="mb-2 text-lg font-medium">Nenhum serviço encontrado</p>
                     <p className="text-sm">
                       Nenhum serviço corresponde aos filtros aplicados.
                       {debouncedSearchTerm && ` Pesquisa: "${debouncedSearchTerm}"`}
@@ -288,7 +289,7 @@ export function Services() {
                   </>
                 ) : (
                   <>
-                    <p className="text-lg font-medium mb-2">Nenhum serviço encontrado</p>
+                    <p className="mb-2 text-lg font-medium">Nenhum serviço encontrado</p>
                     <p className="text-sm">Clique em "Adicionar Serviço" para criar o primeiro serviço.</p>
                   </>
                 )}
@@ -296,29 +297,29 @@ export function Services() {
             </div>
           ) : (
             <>
-              <div className="block md:hidden space-y-4">
+              <div className="block space-y-4 md:hidden">
                 {paginatedServices.map((service) => (
                   <ServiceDetailsModal
                     key={service.id}
                     serviceId={service.id}
                     trigger={
-                      <Card className="border border-gray-200 cursor-pointer hover:shadow-md transition-shadow">
+                      <Card className="transition-shadow border border-gray-200 cursor-pointer hover:shadow-md">
                         <CardContent className="p-3 sm:p-4">
                           <div className="space-y-3">
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="font-medium text-sm sm:text-base line-clamp-2 flex-1">
+                              <h3 className="flex-1 text-sm font-medium sm:text-base line-clamp-2">
                                 {service.name}
                               </h3>
                               <Badge 
                                 variant={service.isActive ? 'default' : 'secondary'}
                                 style={service.isActive ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
-                                className="text-xs flex-shrink-0"
+                                className="flex-shrink-0 text-xs"
                               >
                                 {service.isActive ? 'Ativo' : 'Inativo'}
                               </Badge>
                             </div>
                             
-                            <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                            <p className="text-xs text-gray-500 sm:text-sm line-clamp-2">
                               {service.description}
                             </p>
                             
@@ -332,7 +333,7 @@ export function Services() {
                             </div>
                             
                             <div className="flex items-center justify-between">
-                              <div className="flex flex-col sm:flex-row sm:gap-4 gap-1">
+                              <div className="flex flex-col gap-1 sm:flex-row sm:gap-4">
                                 <div className="flex items-center gap-1">
                                   <span className="text-xs text-gray-400">Duração:</span>
                                   <span className="text-sm font-medium">
@@ -349,8 +350,8 @@ export function Services() {
                               
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                  <Button variant="ghost" size="sm" className="flex-shrink-0 w-8 h-8 p-0">
+                                    <MoreHorizontal className="w-4 h-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
@@ -358,7 +359,7 @@ export function Services() {
                                   service={service}
                                   trigger={
                                     <DropdownMenuItem>
-                                      <Edit className="mr-2 h-4 w-4" />
+                                      <Edit className="w-4 h-4 mr-2" />
                                       Editar Serviço
                                     </DropdownMenuItem>
                                   }
@@ -367,7 +368,7 @@ export function Services() {
                                   service={service}
                                   trigger={
                                     <DropdownMenuItem className="text-red-600">
-                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      <Trash2 className="w-4 h-4 mr-2" />
                                       Excluir Serviço
                                     </DropdownMenuItem>
                                   }
@@ -384,31 +385,31 @@ export function Services() {
               </div>
 
               <div className="hidden md:block">
-                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="-mx-4 overflow-x-auto sm:mx-0">
                   <div className="inline-block min-w-full align-middle">
                     <div className="overflow-hidden shadow-sm ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                       <Table className="min-w-full divide-y divide-gray-200">
                         <TableHeader className="bg-gray-50">
               <TableRow>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <TableHead className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                         Nome do Serviço
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                      <TableHead className="hidden px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase lg:table-cell">
                         Tipo
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                      <TableHead className="hidden px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase xl:table-cell">
                         Categoria
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                      <TableHead className="hidden px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase xl:table-cell">
                         Duração
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <TableHead className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                         Preço
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                      <TableHead className="hidden px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase xl:table-cell">
                         Status
                       </TableHead>
-                      <TableHead className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <TableHead className="px-3 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
                         Ações
                       </TableHead>
               </TableRow>
@@ -425,7 +426,7 @@ export function Services() {
                                 <div className="text-sm text-gray-500 truncate md:line-clamp-1">
                                   {service.description}
                                 </div>
-                                <div className="mt-1 flex flex-wrap gap-1 xl:hidden">
+                                <div className="flex flex-wrap gap-1 mt-1 xl:hidden">
                                   <Badge variant="outline" className="text-xs">
                                     {getTypeLabel(service.type)}
                                   </Badge>
@@ -440,7 +441,7 @@ export function Services() {
                         <ServiceDetailsModal
                           serviceId={service.id}
                           trigger={
-                            <TableCell className="px-3 py-4 cursor-pointer hidden lg:table-cell">
+                            <TableCell className="hidden px-3 py-4 cursor-pointer lg:table-cell">
                               <Badge variant="outline" className="text-sm">{getTypeLabel(service.type)}</Badge>
                             </TableCell>
                           }
@@ -448,7 +449,7 @@ export function Services() {
                         <ServiceDetailsModal
                           serviceId={service.id}
                           trigger={
-                            <TableCell className="px-3 py-4 cursor-pointer hidden xl:table-cell">
+                            <TableCell className="hidden px-3 py-4 cursor-pointer xl:table-cell">
                               <Badge variant="outline" className="text-sm">{getCategoryLabel(service.category)}</Badge>
                             </TableCell>
                           }
@@ -456,7 +457,7 @@ export function Services() {
                         <ServiceDetailsModal
                           serviceId={service.id}
                           trigger={
-                            <TableCell className="px-3 py-4 text-gray-600 cursor-pointer hidden xl:table-cell">
+                            <TableCell className="hidden px-3 py-4 text-gray-600 cursor-pointer xl:table-cell">
                               <span className="text-sm font-medium">{formatDuration(service.duration)}</span>
                             </TableCell>
                           }
@@ -474,7 +475,7 @@ export function Services() {
                         <ServiceDetailsModal
                           serviceId={service.id}
                           trigger={
-                            <TableCell className="px-3 py-4 cursor-pointer hidden xl:table-cell">
+                            <TableCell className="hidden px-3 py-4 cursor-pointer xl:table-cell">
                     <Badge 
                                 variant={service.isActive ? 'default' : 'secondary'}
                                 style={service.isActive ? { backgroundColor: '#95CA3C', color: 'white' } : {}}
@@ -488,8 +489,8 @@ export function Services() {
                   <TableCell className="px-3 py-4 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
+                        <Button variant="ghost" className="w-8 h-8 p-0">
+                          <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -497,7 +498,7 @@ export function Services() {
                                 service={service}
                                 trigger={
                         <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
+                          <Edit className="w-4 h-4 mr-2" />
                                     Editar Serviço
                         </DropdownMenuItem>
                                 }
@@ -506,7 +507,7 @@ export function Services() {
                                 service={service}
                                 trigger={
                         <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="w-4 h-4 mr-2" />
                                     Excluir Serviço
                         </DropdownMenuItem>
                                 }
@@ -526,12 +527,12 @@ export function Services() {
           )}
           
           {filteredServices.length > 0 && totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
-              <div className="text-sm text-gray-600 order-2 sm:order-1">
+            <div className="flex flex-col items-center justify-between gap-4 pt-4 border-t sm:flex-row">
+              <div className="order-2 text-sm text-gray-600 sm:order-1">
                 Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, totalServices)} de {totalServices} serviços
               </div>
               
-              <div className="flex items-center gap-2 order-1 sm:order-2">
+              <div className="flex items-center order-1 gap-2 sm:order-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -539,7 +540,7 @@ export function Services() {
                   disabled={currentPage === 1}
                   className="flex items-center gap-1"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Anterior</span>
                 </Button>
                 
@@ -578,7 +579,7 @@ export function Services() {
                   className="flex items-center gap-1"
                 >
                   <span className="hidden sm:inline">Próxima</span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
