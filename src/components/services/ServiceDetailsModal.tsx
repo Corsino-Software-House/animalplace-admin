@@ -16,12 +16,13 @@ interface ServiceDetailsModalProps {
 }
 
 const getCategoryLabel = (category: ServiceCategory) => {
-  const labels = {
+  const labels: Record<ServiceCategory, string> = {
     [ServiceCategory.CLINICAL]: 'Clínico',
     [ServiceCategory.AESTHETIC]: 'Estético',
     [ServiceCategory.SURGICAL]: 'Cirúrgico',
     [ServiceCategory.DIAGNOSTIC]: 'Diagnóstico',
     [ServiceCategory.VACCINE]: 'Vacina',
+    [ServiceCategory.TRANSPORT]: 'Transporte',
   };
   return labels[category] || category;
 };
@@ -73,7 +74,7 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
 
   const defaultTrigger = (
     <Button variant="ghost" size="sm">
-      <Eye className="h-4 w-4" />
+      <Eye className="w-4 h-4" />
     </Button>
   );
 
@@ -92,15 +93,15 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
         {isLoading ? (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-6 w-full" />
+              <Skeleton className="w-20 h-4" />
+              <Skeleton className="w-full h-6" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {[...Array(4)].map((_, i) => (
                 <Card key={i}>
                   <CardContent className="p-4">
-                    <Skeleton className="h-4 w-16 mb-2" />
-                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="w-16 h-4 mb-2" />
+                    <Skeleton className="w-24 h-6" />
                   </CardContent>
                 </Card>
               ))}
@@ -109,8 +110,8 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
         ) : error ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Erro ao carregar serviço</h3>
+              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+              <h3 className="mb-2 text-lg font-semibold">Erro ao carregar serviço</h3>
               <p className="text-gray-600">Não foi possível carregar os detalhes do serviço.</p>
             </div>
           </div>
@@ -128,16 +129,16 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
 
             <div className="space-y-2">
               <h4 className="font-medium text-gray-900">Descrição</h4>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+              <p className="text-sm leading-relaxed text-gray-600 sm:text-base">
                 {service.description}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="h-4 w-4 text-green-600" />
+                    <DollarSign className="w-4 h-4 text-green-600" />
                     <span className="text-sm font-medium text-gray-600">Preço</span>
                   </div>
                   <div className="text-xl font-bold text-green-600">
@@ -149,7 +150,7 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <Clock className="h-4 w-4 text-blue-600" />
+                    <Clock className="w-4 h-4 text-blue-600" />
                     <span className="text-sm font-medium text-gray-600">Duração</span>
                   </div>
                   <div className="text-xl font-bold text-blue-600">
@@ -184,28 +185,28 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
             {service.defaultLimits && (
               <div className="space-y-3">
                 <h4 className="font-medium text-gray-900">Limites Padrão</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <span className="text-sm text-gray-600 block">Limite de Uso</span>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    <span className="block text-sm text-gray-600">Limite de Uso</span>
                     <span className="font-semibold">{service.defaultLimits.limit}x</span>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <span className="text-sm text-gray-600 block">Período</span>
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    <span className="block text-sm text-gray-600">Período</span>
                     <span className="font-semibold">
                       {service.defaultLimits.period === 'month' ? 'Mensal' : 'Anual'}
                     </span>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <span className="text-sm text-gray-600 block">Carência</span>
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    <span className="block text-sm text-gray-600">Carência</span>
                     <span className="font-semibold">{service.defaultLimits.carencyDays} dias</span>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="space-y-3 border-t pt-4">
+            <div className="pt-4 space-y-3 border-t">
               <h4 className="font-medium text-gray-900">Informações do Sistema</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                 <div>
                   <span className="text-gray-600">Criado em:</span>
                   <div className="font-medium">{formatDate(service.createdAt)}</div>
@@ -217,12 +218,12 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
+            <div className="flex flex-col gap-2 pt-4 border-t sm:flex-row">
               <EditServiceModal 
                 service={service}
                 trigger={
                   <Button className="w-full sm:flex-1" variant="outline">
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Edit className="w-4 h-4 mr-2" />
                     Editar Serviço
                   </Button>
                 }
@@ -231,7 +232,7 @@ export function ServiceDetailsModal({ serviceId, trigger }: ServiceDetailsModalP
                 service={service}
                 trigger={
                   <Button className="w-full sm:flex-1" variant="outline">
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Excluir Serviço
                   </Button>
                 }
