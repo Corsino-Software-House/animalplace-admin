@@ -18,6 +18,7 @@ import { EditPlanModal } from '@/components/plans/EditPlanModal';
 import { DeletePlanDialog } from '@/components/plans/DeletePlanDialog';
 import { PlanDetailsModal } from '@/components/plans/PlanDetailsModal';
 import { ManagePlanServicesModal } from '@/components/plans/ManagePlanServicesModal';
+import { NotifyTermsChangeModal } from '@/components/plans/NotifyTermsChangeModal';
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -70,7 +71,8 @@ export function Plans() {
           <h1 className="text-2xl font-bold sm:text-3xl">Gerenciamento de Planos</h1>
           <p className="mt-1 text-sm text-gray-600 sm:mt-2 sm:text-base">Crie e gerencie planos de assinatura para sua plataforma</p>
         </div>
-        <div className="w-full sm:w-auto">
+        <div className="flex flex-wrap items-center w-full gap-2 sm:w-auto">
+          <NotifyTermsChangeModal />
           <CreatePlanModal />
         </div>
       </div>
