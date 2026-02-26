@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,18 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Bell, Loader2, Send, AlertTriangle, Info } from 'lucide-react';
-import { api } from '@/lib/api';
-
-interface NotifyTermsChangePayload {
-  effectiveDate: string;
-  summary: string;
-  detailsUrl: string;
-}
-
-async function sendTermsChangeNotification(payload: NotifyTermsChangePayload) {
-  const { data } = await api.post('/plans/notify-terms-change', payload);
-  return data;
-}
+import { useNotifyTermsChange } from '@/hooks/usePlans';
 
 interface NotifyTermsChangeModalProps {
   trigger?: React.ReactNode;
@@ -41,28 +27,12 @@ export function NotifyTermsChangeModal({ trigger }: NotifyTermsChangeModalProps)
     detailsUrl: '',
   });
 
-  const mutation = useMutation({
-    mutationFn: sendTermsChangeNotification,
-    onSuccess: () => {
-      toast.success('Notificações enviadas com sucesso!', {
-        description: 'Todos os assinantes ativos foram notificados por email.',
-      });
-      setOpen(false);
-      resetState();
-    },
-    onError: (error: any) => {
-      toast.error('Erro ao enviar notificações', {
-        description: error?.response?.data?.message || 'Tente novamente em instantes.',
-      });
-    },
-  });
+  const mutation = useNotifyTermsChange();
 
-  // Data mínima: amanhã
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split('T')[0];
 
-  // Dias até a vigência
   const daysUntilEffective = form.effectiveDate
     ? Math.ceil(
         (new Date(form.effectiveDate).getTime() - new Date().getTime()) /
@@ -81,11 +51,19 @@ export function NotifyTermsChangeModal({ trigger }: NotifyTermsChangeModalProps)
 
   const handleSubmit = () => {
     if (!isFormValid) return;
-    mutation.mutate({
-      effectiveDate: form.effectiveDate,
-      summary: form.summary.trim(),
-      detailsUrl: form.detailsUrl.trim(),
-    });
+    mutation.mutate(
+      {
+        effectiveDate: form.effectiveDate,
+        summary: form.summary.trim(),
+        detailsUrl: form.detailsUrl.trim(),
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          resetState();
+        },
+      },
+    );
   };
 
   const defaultTrigger = (
@@ -117,7 +95,6 @@ export function NotifyTermsChangeModal({ trigger }: NotifyTermsChangeModalProps)
           </DialogDescription>
         </DialogHeader>
 
-        {/* Alertas de informação */}
         <div className="space-y-2">
           <Alert>
             <Info className="w-4 h-4" />
@@ -139,7 +116,6 @@ export function NotifyTermsChangeModal({ trigger }: NotifyTermsChangeModalProps)
           )}
         </div>
 
-        {/* Formulário */}
         <div className="flex-1 mt-2 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="effectiveDate" className="text-sm font-medium">
@@ -188,12 +164,9 @@ export function NotifyTermsChangeModal({ trigger }: NotifyTermsChangeModalProps)
           </div>
         </div>
 
-        {/* Footer com ações */}
         <div className="flex flex-col items-center justify-between gap-3 pt-4 border-t sm:flex-row">
           <div className="text-sm text-gray-600">
-            {isFormValid && (
-              <span>Pronto para enviar</span>
-            )}
+            {isFormValid && <span>Pronto para enviar</span>}
           </div>
 
           <div className="flex w-full gap-2 sm:w-auto">
