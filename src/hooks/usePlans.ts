@@ -6,6 +6,7 @@ import {
   getPlanById,
   getPlanDependencies,
   getPlans,
+  notifyTermsChange,
   removeServicesFromPlan,
   updatePlan,
 } from "@/services/plans-service";
@@ -189,5 +190,31 @@ export function usePlanDependencies(planId: string, enabled: boolean = true) {
     },
     enabled: enabled && !!planId,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useNotifyTermsChange() {
+  return useMutation({
+    mutationFn: async (payload: {
+      effectiveDate: string;
+      summary: string;
+      detailsUrl: string;
+    }) => {
+      const response = await notifyTermsChange(payload);
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sucesso",
+        description: "Todos os assinantes ativos foram notificados por email.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao enviar notificações. Tente novamente.",
+        variant: "destructive",
+      });
+    },
   });
 }

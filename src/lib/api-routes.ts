@@ -89,6 +89,8 @@ export const PLAN_REMOVE_SERVICES = (planId: string) =>
 export const PLAN_DEPENDENCIES = (planId: string) =>
   `/api/plans/${planId}/dependencies`;
 
+export const PLAN_TERMS = () => `/api//plans/notify-terms-change`;
+
 // Profissionais
 export const PROFESSIONALS_API = {
   ALL: "/api/scheduling/professionals/all",

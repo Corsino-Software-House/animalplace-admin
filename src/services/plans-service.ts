@@ -5,6 +5,7 @@ import {
   PLAN_ADD_SERVICES,
   PLAN_DEPENDENCIES,
   PLAN_REMOVE_SERVICES,
+  PLAN_TERMS,
 } from "@/lib/api-routes";
 import { Plan } from "@/types/plans";
 
@@ -67,3 +68,12 @@ export const getPlanDependencies = async (planId: string) => {
   const response = await api.get<PlanDependencies>(PLAN_DEPENDENCIES(planId));
   return response.data;
 };
+
+export async function notifyTermsChange(payload: {
+  effectiveDate: string;
+  summary: string;
+  detailsUrl: string;
+}): Promise<{ message: string }> {
+  const { data } = await api.post(PLAN_TERMS(), payload);
+  return data;
+}
