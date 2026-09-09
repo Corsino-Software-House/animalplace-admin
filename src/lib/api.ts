@@ -1,16 +1,16 @@
-import axios from 'axios';
-import { env } from './env';
+import axios from "axios";
+import { env } from "./env";
 
 export const api = axios.create({
-  baseURL: env.BASE_URL_API,
+  baseURL: env.BASE_URL_API || "http://srv1646748.hstgr.cloud:3000",
   headers: {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('animalplace_token');
+  const token = localStorage.getItem("animalplace_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -22,26 +22,27 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       const originalRequest = error.config;
-      
+
       const hasAuthHeader = originalRequest?.headers?.Authorization;
-      
+
       if (hasAuthHeader) {
-        localStorage.removeItem('animalplace_token');
-        localStorage.removeItem('animalplace_user');
-        
+        localStorage.removeItem("animalplace_token");
+        localStorage.removeItem("animalplace_user");
+
         const currentPath = window.location.pathname;
-        const isPublicPage = currentPath === '/login' || 
-                           currentPath === '/register' || 
-                           currentPath.startsWith('/verify-email');
-        
+        const isPublicPage =
+          currentPath === "/login" ||
+          currentPath === "/register" ||
+          currentPath.startsWith("/verify-email");
+
         if (!isPublicPage) {
           setTimeout(() => {
-            window.location.href = '/login';
+            window.location.href = "/login";
           }, 100);
         }
       }
     }
-    
+
     return Promise.reject(error);
-  }
+  },
 );
