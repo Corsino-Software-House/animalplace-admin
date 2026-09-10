@@ -22,6 +22,7 @@ jobs:
       - run: pnpm run build
         env:
           VITE_BASE_URL_API: https://api.animalplace.com.br
+          BASE_URL_API: https://api.animalplace.com.br
 
       - name: Copy build to VPS
         uses: appleboy/scp-action@v0.1.7
