@@ -2,7 +2,7 @@ import axios from "axios";
 import { env } from "./env";
 
 export const api = axios.create({
-  baseURL: env.BASE_URL_API || "http://srv1646748.hstgr.cloud:3000",
+  baseURL: env.BASE_URL_API || "https://api.animalplace.com.br",
   headers: {
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": "true",
