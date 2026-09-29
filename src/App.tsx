@@ -17,6 +17,7 @@ import { Cashbacks } from '@/pages/Cashbacks';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -41,6 +42,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
             
             <Route
               path="/"

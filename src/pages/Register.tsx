@@ -328,6 +328,11 @@ export default function Register() {
                   Fazer login
                 </Link>
               </p>
+              <p className="mt-3 text-sm text-gray-600">
+                <Link to="/politica-de-privacidade" className="font-medium text-[#668a35] hover:underline">
+                  Política de Privacidade
+                </Link>
+              </p>
             </div>
           </CardContent>
         </Card>
