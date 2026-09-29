@@ -40,28 +40,28 @@ export default function PrivacyPolicy() {
   return (
     <main className="min-h-screen bg-[#f6f8f2] text-[#20251b]">
       <header className="border-b border-[#e5e9df] bg-white">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
+        <div className="flex items-center justify-between w-full max-w-6xl px-5 py-5 mx-auto sm:px-8">
           <Link to="/register" className="flex items-center gap-3" aria-label="AnimalPlace, voltar ao cadastro">
             <PawPrint className="h-8 w-8 text-[#78a92d]" aria-hidden="true" />
-            <span className="font-space-grotesk text-xl font-bold">AnimalPlace</span>
+            <span className="text-xl font-bold font-space-grotesk">AnimalPlace</span>
           </Link>
           <Link
             to="/register"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#4c5b3b] transition-colors hover:text-[#78a92d]"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Voltar ao cadastro
           </Link>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
+      <div className="w-full max-w-4xl px-5 py-12 mx-auto sm:px-8 sm:py-16">
         <div className="mb-8 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.12em] text-[#668a35]">
-          <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+          <ShieldCheck className="w-5 h-5" aria-hidden="true" />
           Privacidade e transparência
         </div>
 
-        <h1 className="font-space-grotesk text-4xl font-bold leading-tight sm:text-5xl">
+        <h1 className="text-4xl font-bold leading-tight font-space-grotesk sm:text-5xl">
           Política de Privacidade
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-8 text-[#62695c]">
@@ -73,8 +73,8 @@ export default function PrivacyPolicy() {
         </aside>
 
         <nav className="mt-10 border-y border-[#dfe5d7] py-6" aria-label="Índice da política">
-          <h2 className="mb-4 font-space-grotesk text-lg font-semibold">Nesta política</h2>
-          <ol className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+          <h2 className="mb-4 text-lg font-semibold font-space-grotesk">Nesta política</h2>
+          <ol className="grid text-sm gap-x-8 gap-y-2 sm:grid-cols-2">
             {policySections.map(([title], index) => (
               <li key={title}>
                 <a className="text-[#536c34] hover:underline" href={`#policy-section-${index + 1}`}>
@@ -88,15 +88,15 @@ export default function PrivacyPolicy() {
         <article className="divide-y divide-[#e5e9df]">
           {policySections.map(([title, content], index) => (
             <section className="scroll-mt-8 py-7" id={`policy-section-${index + 1}`} key={title}>
-              <h2 className="font-space-grotesk text-xl font-semibold leading-snug sm:text-2xl">{title}</h2>
+              <h2 className="text-xl font-semibold leading-snug font-space-grotesk sm:text-2xl">{title}</h2>
               <p className="mt-4 text-[15px] leading-7 text-[#4f5649]">{content}</p>
             </section>
           ))}
         </article>
 
         <footer className="mt-12 border-t border-[#dfe5d7] pt-6 text-sm text-[#737a6d]">
-          <p>Última atualização: [dia/mês/ano]</p>
-        </footer>
+          <p>Última atualização: 28/09/2026</p>
+        </footer>d
       </div>
     </main>
   );
